@@ -1,0 +1,1 @@
+# funções de ler e salvar dados nos arquivos JSON
