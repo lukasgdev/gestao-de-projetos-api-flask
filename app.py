@@ -1,10 +1,13 @@
 from flask import Flask, jsonify
+from routes.users import user_route
 
 app = Flask(__name__)
 
-@app.route('/')
-def main():
-    return jsonify({"message" : "API Funcionando"})
+app.register_blueprint(user_route)
 
-if __name__ == "__main__":
+@app.route("/")
+def api():
+    return jsonify(msg="Api funcionando.")
+
+if __name__ == '__main__':
     app.run(debug=True)

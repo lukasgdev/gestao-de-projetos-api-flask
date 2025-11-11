@@ -1,0 +1,1 @@
+# funções para ler, escrever, gerar ID e etc para os arquivos CSV
