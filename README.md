@@ -1,6 +1,6 @@
-# API de Gerenciamento de Projetos (Kanban)
+# API de Gerenciamento de Projetos
 
-Esta é uma API REST desenvolvida em Flask para a disciplina de Linguagem de Programação. O projeto simula um sistema de gerenciamento de tarefas no estilo Kanban (similar ao Trello), com foco na autenticação de usuários e persistência de dados em arquivos CSV.
+Esta é uma API REST desenvolvida em Flask para a disciplina de Linguagem de Programação. O projeto simula um sistema de gerenciamento de tarefas (similar ao Trello), com foco na autenticação de usuários e persistência de dados em arquivos CSV.
 
 ---
 
