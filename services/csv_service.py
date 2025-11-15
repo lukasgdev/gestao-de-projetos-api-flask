@@ -13,6 +13,7 @@ db_path = os.path.join(main_path, 'db')
 
 # caminho especifico dos arquivos
 USERS = os.path.join(db_path, "usuarios.csv")
+USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 
 def save_csv (arq, fieldnames, data):
     with open(arq, 'a', encoding='utf-8', newline='') as file:
@@ -22,6 +23,14 @@ def save_csv (arq, fieldnames, data):
             writer.writeheader()
 
         writer.writerow(data)
+
+def overwrite_csv(arq, fieldnames, data_list):
+    with open(arq, 'w', encoding='utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        
+        writer.writeheader()
+    
+        writer.writerows(data_list)
 
 def read_csv (arq):
     try:
@@ -49,6 +58,9 @@ def find_user_by_id(user_id):
 
 def get_next_user_id():
     users = read_csv(USERS)
+
+    if not users:
+        return 1
     
     max_id = 0
     for user in users:
@@ -58,6 +70,23 @@ def get_next_user_id():
     
     return max_id + 1
 
+def update_user_data(user_id, new_data):
+    users = read_csv(USERS)
+    updated_users_list = []
+    target_id = str(user_id) 
+    for user in users:
+        if user["user_id"] == target_id:
+            user.update(new_data)
+        updated_users_list.append(user)
+    
+    overwrite_csv(USERS, USER_FIELDNAMES, updated_users_list)
+
+def delete_user_data(user_id):
+    users = read_csv(USERS)
+    target_id = str(user_id) 
+    users = [user for user in users if user['user_id'] != target_id]
+
+    overwrite_csv(USERS,USER_FIELDNAMES,users)
+
 def save_user(user):
-    USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash']
     save_csv(USERS, USER_FIELDNAMES, user)
