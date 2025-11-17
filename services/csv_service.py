@@ -12,8 +12,11 @@ main_path = os.path.dirname(current_path)
 db_path = os.path.join(main_path, 'db')
 
 # caminho especifico dos arquivos
-USERS = os.path.join(db_path, "usuarios.csv")
+USERS = os.path.join(db_path, "users.csv")
+PROJECTS = os.path.join(db_path, "projects.csv")
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
+PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
+
 
 def save_csv (arq, fieldnames, data):
     with open(arq, 'a', encoding='utf-8', newline='') as file:
@@ -70,6 +73,20 @@ def get_next_user_id():
     
     return max_id + 1
 
+def get_next_project_id():
+    projects = read_csv(PROJECTS)
+
+    if not projects:
+        return 1
+    
+    max_id = 0
+    for project in projects:
+        project_id = int(project.get('project_id', 0))
+        if project_id > max_id:
+            max_id = project_id
+    
+    return max_id + 1
+
 def update_user_data(user_id, new_data):
     users = read_csv(USERS)
     updated_users_list = []
@@ -81,6 +98,54 @@ def update_user_data(user_id, new_data):
     
     overwrite_csv(USERS, USER_FIELDNAMES, updated_users_list)
 
+def update_project_data(project_id, new_data):
+    projects = read_csv(PROJECTS)
+    updated_projects_list = []
+    target_id = str(project_id)
+ 
+    for project in projects:
+        if project.get('project_id') == target_id:
+            project.update(new_data)  # Atualiza o dicionário
+        updated_projects_list.append(project)
+     
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, updated_projects_list)
+
+def delete_project_data(project_id):
+    projects = read_csv(PROJECTS)
+    target_id = str(project_id) 
+     
+    remaining_projects = [
+        project for project in projects 
+        if project.get('project_id') != target_id
+    ]
+    
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining_projects)
+
+def find_project_by_id(project_id):
+    projects = read_csv(PROJECTS)
+    target_id = str(project_id) 
+    for project in projects:
+        if project.get('project_id') == target_id:
+            return project
+    return None
+
+def find_projects_by_user_id(user_id):
+    all_projects = read_csv(PROJECTS)
+
+    user = find_user_by_id(user_id)
+    
+    my_projects = []
+    target_user_id = str(user_id) 
+ 
+    for project in all_projects:
+        project_user_id = project.get('user_id')
+        if project_user_id == target_user_id:
+            project.pop('user_id')
+            project['owner_user'] = user['name']
+            my_projects.append(project)
+             
+    return my_projects
+
 def delete_user_data(user_id):
     users = read_csv(USERS)
     target_id = str(user_id) 
@@ -90,3 +155,6 @@ def delete_user_data(user_id):
 
 def save_user(user):
     save_csv(USERS, USER_FIELDNAMES, user)
+
+def save_project(project):
+    save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
