@@ -42,7 +42,7 @@ def create_project():
 def get_my_projects():
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
-    
+        
     # Verifica se o usuário existe
     if not user:
         return jsonify({"msg": "Usuário não encontrado"}), 404   

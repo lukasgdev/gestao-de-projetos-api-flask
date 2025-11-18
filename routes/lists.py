@@ -10,6 +10,7 @@ list_route = Blueprint('lists', __name__)
 
 
 # CRIAR UMA NOVA LISTA (COLUNA) PARA UM PROJETO
+
 # Ex: Criar a coluna "Aguardando Aprovação" no Projeto 1
 
 @list_route.route('/<project_id>/lists', methods=['POST'])
@@ -49,7 +50,6 @@ def create_list_for_project(project_id):
 @list_route.route('/<project_id>/lists', methods=['GET'])
 @jwt_required()
 def get_project_lists(project_id):
-    # (Opcional) Você pode adicionar verificação de dono aqui também se quiser privacidade total
-    
+    #Verifica se o projeto existe
     my_lists = find_lists_by_project_id(project_id)
     return jsonify(my_lists), 200
