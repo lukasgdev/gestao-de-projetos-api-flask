@@ -14,9 +14,11 @@ db_path = os.path.join(main_path, 'db')
 # caminho especifico dos arquivos
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
+LISTS = os.path.join(db_path, "listas.csv")
+
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
-
+LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
 
 def save_csv (arq, fieldnames, data):
     with open(arq, 'a', encoding='utf-8', newline='') as file:
@@ -158,3 +160,28 @@ def save_user(user):
 
 def save_project(project):
     save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
+
+def get_next_list_id():
+    lists = read_csv(LISTS)
+    if not lists:
+        return 1
+    max_id = 0
+    for lista in lists:
+        lists_id = lista.get('list_id', 0)
+        if lists_id > max_id:
+            max_id = lists_id
+    return max_id + 1
+
+def save_list(lista_data):
+    save_csv(LISTS, LIST_FIELDNAMES, lista_data)
+
+def find_lists_by_project_id(project_id):
+    all_lists = read_csv(LISTS)
+    project_lists = []
+    target_id = str(project_id)
+    
+    for lista in all_lists:
+        if lista.get('project_id') == target_id:
+            project_lists.append(lista)
+            
+    return project_lists

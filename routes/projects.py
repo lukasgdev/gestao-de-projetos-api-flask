@@ -41,20 +41,25 @@ def create_project():
 @jwt_required()
 def get_my_projects():
     current_user_id = get_jwt_identity()
-
     user = find_user_by_id(current_user_id)
-
+    
+    # Verifica se o usuário existe
     if not user:
-        return jsonify({"msg": "Usuário não encontrado"}), 404    
-
+        return jsonify({"msg": "Usuário não encontrado"}), 404   
+     
+    # Busca os projetos do usuário
     my_projects = find_projects_by_user_id(current_user_id)
+
+    # Verifica se o usuário possui projetos
+    if not my_projects:
+        return jsonify(msg="Você não possui projetos criados."), 200
+    
     return jsonify(my_projects), 200
 
 @projects_route.route("/projects/<project_id>")
 @jwt_required()
 def get_specific_project(project_id):
     current_user_id = get_jwt_identity()
-
     user = find_user_by_id(current_user_id)
 
     if not user:
