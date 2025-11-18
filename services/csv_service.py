@@ -14,8 +14,10 @@ db_path = os.path.join(main_path, 'db')
 # caminho especifico dos arquivos
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
+TASKS = os.path.join(db_path, "tasks.csv")
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
+TASK_FIELDNAMES = ['task_id', 'title', 'description', 'status', 'project_id']
 
 
 def save_csv (arq, fieldnames, data):
@@ -44,6 +46,45 @@ def read_csv (arq):
         print(f'Erro ao ler o CSV {arq}: {e}')
         return []
     
+def get_next_task_id():
+    tasks = read_csv(TASKS)
+    if not tasks:
+        return 1
+    max_id = max(int(t.get("task_id", 0)) for t in tasks)
+    return max_id + 1
+
+def find_task_by_id(task_id):
+    tasks = read_csv(TASKS)
+    target = str(task_id)
+    for task in tasks:
+        if task["task_id"] == target:
+            return task
+    return None
+
+
+def find_tasks_by_project(project_id):
+    tasks = read_csv(TASKS)
+    return [t for t in tasks if t["project_id"] == str(project_id)]
+
+def update_task(task_id, new_data):
+    tasks = read_csv(TASKS)
+    target = str(task_id)
+    updated = []
+
+    for task in tasks:
+        if task["task_id"] == target:
+            task.update(new_data)
+        updated.append(task)
+
+    overwrite_csv(TASKS, TASK_FIELDNAMES, updated)
+
+
+def delete_task(task_id):
+    tasks = read_csv(TASKS)
+    target = str(task_id)
+    updated = [t for t in tasks if t["task_id"] != target]
+    overwrite_csv(TASKS, TASK_FIELDNAMES, updated)
+
 def find_user_by_email(email):
     users = read_csv(USERS)
     for user in users:
@@ -158,3 +199,6 @@ def save_user(user):
 
 def save_project(project):
     save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
+
+def save_task(task):
+    save_csv(TASKS, TASK_FIELDNAMES, task)
