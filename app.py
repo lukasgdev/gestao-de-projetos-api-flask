@@ -14,7 +14,7 @@ jwt = JWTManager(app)
 app.register_blueprint(user_route)
 app.register_blueprint(projects_route, url_prefix='/user')
 app.register_blueprint(list_route, url_prefix='/user/projects')
-app.register_blueprint(tasks_route, url_prefix='/user/projects/<project_id>/lists/<list_id>')
+app.register_blueprint(tasks_route, url_prefix='/user')
 
 @app.route("/")
 def api():
