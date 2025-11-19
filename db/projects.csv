@@ -4,5 +4,9 @@ project_id,user_id,project_title,project_description,created_on
 4,3,projeto alemao,invadir paises,2025-11-16 22:35:19
 5,3,projeto alemao,invadir paises,2025-11-16 22:38:16
 6,2,Projeto Likas,vai tomar no cu,2025-11-16 23:13:40
+<<<<<<< HEAD
 7,4,Projeto pauzudo,,2025-11-18 22:29:20
 8,4,Projeto lembrar de tirar o bug da descrição,o alisu não é bom mesmo,2025-11-18 22:30:52
+=======
+7,4,AgoraFoi,Testado...,2025-11-18 21:19:50
+>>>>>>> 0bce1197abb2f3aa0affde9cc81d09bcb0239b93

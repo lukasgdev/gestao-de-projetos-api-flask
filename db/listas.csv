@@ -1,2 +1,7 @@
 list_id,project_id,list_name,created_on
+<<<<<<< HEAD
 1,8,Pinto Mole,2025-11-18 22:31:10
+=======
+2,7,Centavo furado,2025-11-18 21:42:49
+3,7,Centavo largo,2025-11-18 21:43:04
+>>>>>>> 0bce1197abb2f3aa0affde9cc81d09bcb0239b93
