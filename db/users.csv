@@ -1,2 +1,0 @@
-user_id,name,email,password_hash,created_on
-1,Lukas,lgs38@gmail.com,scrypt:32768:8:1$S8assskPwTPmo5W8$fb5ad8a9ea74fb86c1b17177bc4d2620aa2bba7d690fd618a1b5b0965ed5d4ebd8196817f6cfdff35499765cddfa75f7eb74ac0236f5c5fdb61dbd81b11b0474,2025-11-18 21:43:20
