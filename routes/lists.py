@@ -110,6 +110,10 @@ def update_list(project_id, list_id):
     # Pega o novo nome
     data = request.json
     new_name = data.get('list_name')
+    search_project = project.get('project_id')
+
+    if not search_project:
+        return jsonify(msg="Projeto não encontrado"), 404
 
     if not new_name:
         return jsonify(msg="O novo nome da lista é obrigatório"), 400
