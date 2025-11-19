@@ -15,12 +15,14 @@ USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
 LISTS = os.path.join(db_path, "lists.csv")
 TASKS = os.path.join(db_path, "tasks.csv")
+COMMENTS = os.path.join(db_path, "comments.csv")
 
 # fieldnames
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description', 'created_on']
 LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
 TASKS_FIELDNAMES = ['task_id', 'title', 'description', 'status', 'created_on', 'list_id']
+COMMENTS_FIELDNAMES =['comment_id','task_id','content','created_on']
 
 
 # ========= FUNÇÕES GENÉRICAS DE CSV ==========
@@ -258,3 +260,50 @@ def delete_task_data(task_id):
     tasks = read_csv(TASKS)
     remaining = [t for t in tasks if t.get("task_id") != target_id]
     overwrite_csv(TASKS, TASKS_FIELDNAMES, remaining)
+
+
+#comments
+
+def find_comments_by_task_id(task_id):
+    comments = read_csv(COMMENTS)
+    return [c for c in comments if str(c["task_id"]) == str(task_id)]
+
+
+def get_next_comment_id():
+    comments = read_csv(COMMENTS)
+    if not comments:
+        return 1
+
+    valid_ids = [int(c["comment_id"]) for c in comments if c.get("comment_id") and c["comment_id"].isdigit()]
+    return max(valid_ids) + 1 if valid_ids else 1
+
+
+def save_comment(comment):
+    save_csv(COMMENTS, COMMENTS_FIELDNAMES, comment)
+
+
+def update_comment_data(comment_id, new_content):
+    comments = read_csv(COMMENTS)
+    updated = False
+
+    for c in comments:
+        if str(c["comment_id"]) == str(comment_id):
+            c["content"] = new_content
+            updated = True
+            break
+
+    if updated:
+        save_csv(COMMENTS, COMMENTS_FIELDNAMES, comments)
+
+    return updated
+
+
+def delete_comment_data(comment_id):
+    comments = read_csv(COMMENTS)
+    new_comments = [c for c in comments if str(c["comment_id"]) != str(comment_id)]
+
+    if len(new_comments) == len(comments):
+        return False  # não deletou nada
+
+    save_csv(COMMENTS, COMMENTS_FIELDNAMES, new_comments)
+    return True

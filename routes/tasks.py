@@ -3,7 +3,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 
 from services.csv_service import (
-    read_csv,
     save_task,
     get_next_task_id,
     find_task_by_id,
@@ -18,9 +17,7 @@ from services.csv_service import TASKS
 
 tasks_route = Blueprint("tasks", __name__)
 
-# ============================================================
-# CREATE TASK
-# ============================================================
+
 @tasks_route.post("/projects/<project_id>/lists/<list_id>/tasks")
 @jwt_required()
 def create_task(project_id, list_id):
@@ -31,16 +28,16 @@ def create_task(project_id, list_id):
     if not data:
         return jsonify({"msg": "Nenhum dado enviado"}), 400
 
-    # Verifica se o projeto existe
+    #verifica se o projeto existe
     project = find_project_by_id(project_id)
     if not project:
         return jsonify({"msg": "Projeto não encontrado"}), 404
 
-    # Permissão
+    #permissao de user
     if str(project["user_id"]) != str(current_user_id):
         return jsonify({"msg": "Você não tem permissão para criar tasks neste projeto"}), 403
 
-    # Verifica se a lista existe e pertence ao projeto
+    #verifica se a lista existe e pertence ao projeto
     lista = find_list_by_id(list_id)
     if not lista or str(lista["project_id"]) != str(project_id):
         return jsonify({"msg": "Lista não encontrada no projeto"}), 404
@@ -60,21 +57,19 @@ def create_task(project_id, list_id):
     return jsonify({"msg": "Task criada com sucesso!", "task": new_task}), 201
 
 
-# ============================================================
-# LIST TASKS
-# ============================================================
+
 @tasks_route.get("/projects/<project_id>/lists/<list_id>/tasks")
 @jwt_required()
 def list_tasks(project_id, list_id):
 
     current_user_id = get_jwt_identity()
 
-    # Verifica projeto
+    #verifica projeto
     project = find_project_by_id(project_id)
     if not project or str(project["user_id"]) != str(current_user_id):
         return jsonify({"error": "Projeto não encontrado ou não permitido"}), 403
 
-    # Verifica lista
+    #verifica lista
     lista = find_list_by_id(list_id)
     if not lista or str(lista["project_id"]) != str(project_id):
         return jsonify({"error": "Lista não encontrada"}), 404
@@ -84,9 +79,6 @@ def list_tasks(project_id, list_id):
     return jsonify({"tasks": tasks}), 200
 
 
-# ============================================================
-# UPDATE TASK
-# ============================================================
 @tasks_route.put("/projects/<project_id>/lists/<list_id>/tasks/<task_id>")
 @jwt_required()
 def update_task(project_id, list_id, task_id):
@@ -98,7 +90,7 @@ def update_task(project_id, list_id, task_id):
     if not task:
         return jsonify({"msg": "Task não encontrada"}), 404
 
-    # Verifica se task pertence à lista e ao projeto
+    #testa pra ver se a task pertence a lista e ao projeto
     if str(task["list_id"]) != str(list_id):
         return jsonify({"msg": "Task não pertence à lista informada"}), 400
 
@@ -120,9 +112,6 @@ def update_task(project_id, list_id, task_id):
     return jsonify({"msg": "Task atualizada com sucesso!"}), 200
 
 
-# ============================================================
-# DELETE TASK
-# ============================================================
 @tasks_route.delete("/projects/<project_id>/lists/<list_id>/tasks/<task_id>")
 @jwt_required()
 def delete_task(project_id, list_id, task_id):
@@ -133,7 +122,6 @@ def delete_task(project_id, list_id, task_id):
     if not task:
         return jsonify({"msg": "Task não encontrada"}), 404
 
-    # Verifica se task pertence à lista e ao projeto
     if str(task["list_id"]) != str(list_id):
         return jsonify({"msg": "Task não pertence à lista informada"}), 400
 

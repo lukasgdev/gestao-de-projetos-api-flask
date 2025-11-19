@@ -5,6 +5,7 @@ from routes.users import user_route
 from routes.projects import projects_route
 from routes.lists import list_route
 from routes.tasks import tasks_route
+from routes.comments import comments_route
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "8d5111adeddaafe18a2118d05d12281ffd05af27248cabccbde3dec49d9e987f"
@@ -15,6 +16,7 @@ app.register_blueprint(user_route)
 app.register_blueprint(projects_route, url_prefix='/user')
 app.register_blueprint(list_route, url_prefix='/user/projects')
 app.register_blueprint(tasks_route, url_prefix='/user')
+app.register_blueprint(comments_route, url_prefix='/user')
 
 @app.route("/")
 def api():
