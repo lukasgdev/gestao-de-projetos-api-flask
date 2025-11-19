@@ -8,7 +8,6 @@ from services.csv_service import (
 
 list_route = Blueprint('/lists', __name__)
 
-
 # CRIAR UMA NOVA LISTA (COLUNA) PARA UM PROJETO
 
 # Ex: Criar a coluna "Aguardando Aprovação" no Projeto 1
