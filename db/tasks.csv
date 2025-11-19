@@ -1,2 +1,2 @@
-task_id,title,description,status,project_id
-1,teste,,todo,1
+task_id,title,description,status,project_id,user_id
+1,teste,tem que funfar,todo,9,2
