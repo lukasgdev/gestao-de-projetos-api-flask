@@ -166,8 +166,8 @@ def get_next_list_id():
     if not lists:
         return 1
     max_id = 0
-    for lista in lists:
-        lists_id = lista.get('list_id', 0)
+    for list in lists:
+        lists_id = int(list.get('list_id', 0))
         if lists_id > max_id:
             max_id = lists_id
     return max_id + 1
@@ -180,8 +180,37 @@ def find_lists_by_project_id(project_id):
     project_lists = []
     target_id = str(project_id)
     
-    for lista in all_lists:
-        if lista.get('project_id') == target_id:
-            project_lists.append(lista)
+    for list in all_lists:
+        if list.get('project_id') == target_id:
+            project_lists.append(list)
             
     return project_lists
+
+def find_list_by_id(list_id):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    for list in lists:
+        if list.get('list_id') == target_id:
+            return list
+    return None
+
+def delete_list_data(list_id):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    
+    # Filtra a lista mantendo apenas as que NÃO são o alvo
+    remaining_lists = [l for l in lists if l.get('list_id') != target_id]
+    
+    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining_lists)
+
+def update_list_data(list_id, new_data):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    updated_lists = []
+
+    for list in lists:
+        if list.get('list_id') == target_id:
+            list.update(new_data) # Atualiza os campos
+        updated_lists.append(list)
+    
+    overwrite_csv(LISTS, LIST_FIELDNAMES, updated_lists)

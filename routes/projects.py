@@ -83,7 +83,6 @@ def get_specific_project(project_id):
 def updated_project(project_id):
 
     current_user_id = get_jwt_identity()
-
     user = find_user_by_id(current_user_id)
 
     if not user:
@@ -103,10 +102,11 @@ def updated_project(project_id):
     owner_user_id = project.get("user_id")
     if owner_user_id != current_user_id:
         return jsonify(msg="Você não tem permissão para editar este projeto"), 403
-
+    
+    new_description = project.get("project_description","")
     new_data_to_update = {
         "project_title": new_title,
-        "project_description": data.get("project_description", ""),
+        "project_description": data.get("project_description",new_description),
     }
 
     update_project_data(project_id, new_data_to_update)
@@ -136,4 +136,5 @@ def delete_project(project_id):
     delete_project_data(project_id)
 
     return jsonify(msg="Projeto deletado com sucesso!"), 200
+
 
