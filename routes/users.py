@@ -83,7 +83,7 @@ def user_info():
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"msg": "Usuário não encontrado"}), 404
+        return jsonify({"error": "Nenhum usuário logado"}), 404
     
     return jsonify({
         "id": user.get("user_id"),
@@ -114,10 +114,10 @@ def update_user():
 
         update_user_data(current_user_id, data)
 
-        return jsonify(msg='Cadastro atualizado com sucesso'), 200
+        return jsonify(success='Cadastro atualizado com sucesso'), 200
 
 
-    return jsonify(msg='Informe o que deseja atualizar corretamente'), 400
+    return jsonify(error='Informe o que deseja atualizar corretamente'), 400
 
 @user_route.route('/user', methods=['DELETE'])
 @jwt_required()
@@ -127,16 +127,16 @@ def delete_user():
     password = request.json.get('senha', '')
 
     if not password:
-        return jsonify(msg='informe a senha de usuario'), 400
+        return jsonify(error='informe a senha de usuario'), 400
     
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify(msg='usuário não encontrado'), 404
+        return jsonify(error='usuário não encontrado'), 404
     
     password_hash = user.get('password_hash')
     if check_password_hash(password_hash, password):
         delete_user_data(current_user_id)
-        return jsonify(msg='Usuario deletado'), 200
+        return jsonify(success='Usuario deletado'), 200
 
-    return jsonify(msg='Senha inválida'), 401
+    return jsonify(error='Senha inválida'), 401
