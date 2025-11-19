@@ -1,236 +1,218 @@
-# services/csv_service.py
-# Funções para ler, escrever, gerar ID e manipular CSVs de users, projects e tasks.
+# funções para ler, escrever, gerar ID e etc para os arquivos CSV
 import os
 import csv
-from typing import List, Dict, Any
 
-# paths
+# caminho da pasta atual
 current_path = os.path.dirname(os.path.abspath(__file__))
-main_path = os.path.dirname(current_path)
-db_path = os.path.join(main_path, "db")
 
+# caminho da pasta raiz do projeto
+main_path = os.path.dirname(current_path)
+
+# caminho para a pasta 'db' com os arquivos csv
+db_path = os.path.join(main_path, 'db')
+
+# caminho especifico dos arquivos
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
+LISTS = os.path.join(db_path, "lists.csv")
 TASKS = os.path.join(db_path, "tasks.csv")
 
-# fieldnames (ATENÇÃO: TASKS agora inclui user_id)
-USER_FIELDNAMES = ["user_id", "name", "email", "password_hash", "created_on"]
-PROJECT_FIELDNAMES = ["project_id", "user_id", "project_title", "project_description", "created_on"]
-TASK_FIELDNAMES = ["task_id", "title", "description", "status", "project_id", "user_id"]
+USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
+PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
+LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
+TASKS_FIELDNAMES = ['task_id','title','description','status','created_on','list_id']
 
+def save_csv (arq, fieldnames, data):
+    with open(arq, 'a', encoding='utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
 
-# -------------------------
-# Helpers genéricos de CSV
-# -------------------------
-def _ensure_db_folder():
-    if not os.path.exists(db_path):
-        os.makedirs(db_path, exist_ok=True)
-
-
-def save_csv(arq: str, fieldnames: List[str], data: Dict[str, Any]) -> None:
-    """Anexa uma linha ao CSV; cria header se arquivo não existir ou estiver vazio."""
-    _ensure_db_folder()
-    mode = "a"
-    write_header = not os.path.exists(arq) or os.path.getsize(arq) == 0
-    with open(arq, mode, encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        if write_header:
+        if os.path.getsize(arq) == 0:
             writer.writeheader()
-        # Garantir que o dicionário contenha todas as chaves (preencher com '')
-        row = {k: ("" if data.get(k) is None else str(data.get(k))) for k in fieldnames}
-        writer.writerow(row)
 
+        writer.writerow(data)
 
-def overwrite_csv(arq: str, fieldnames: List[str], data_list: List[Dict[str, Any]]) -> None:
-    """Sobrescreve o CSV por completo com data_list (lista de dicionários)."""
-    _ensure_db_folder()
-    with open(arq, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+def overwrite_csv(arq, fieldnames, data_list):
+    with open(arq, 'w', encoding='utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        
         writer.writeheader()
-        rows = []
-        for d in data_list:
-            row = {k: ("" if d.get(k) is None else str(d.get(k))) for k in fieldnames}
-            rows.append(row)
-        writer.writerows(rows)
+    
+        writer.writerows(data_list)
 
-
-def read_csv(arq: str) -> List[Dict[str, str]]:
-    """Retorna lista de dicionários lidos do CSV. Nunca modifica os dicionários lidos."""
+def read_csv (arq):
     try:
-        if not os.path.exists(arq):
-            return []
-        with open(arq, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            return [dict(row) for row in reader]
+        with open(arq, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            return list(reader)
     except Exception as e:
-        print(f"Erro ao ler o CSV {arq}: {e}")
+        print(f'Erro ao ler o CSV {arq}: {e}')
         return []
+    
+def find_user_by_email(email):
+    users = read_csv(USERS)
+    for user in users:
+        if user.get('email') == email:
+            return user
+    return None
 
+def find_user_by_id(user_id):
+    users = read_csv(USERS)
+    target_id = str(user_id) 
+    for user in users:
+        if user.get('user_id') == target_id:
+            return user
+    return None
 
-# -------------------------
-# IDs auto-incrementais
-# -------------------------
-def _get_next_id_for(arq: str, id_field: str) -> int:
-    rows = read_csv(arq)
-    if not rows:
+def get_next_user_id():
+    users = read_csv(USERS)
+
+    if not users:
         return 1
+    
     max_id = 0
-    for r in rows:
-        try:
-            v = int(r.get(id_field, 0))
-        except Exception:
-            v = 0
-        if v > max_id:
-            max_id = v
+    for user in users:
+        user_id = int(user.get('user_id', 0))
+        if user_id > max_id:
+            max_id = user_id
+    
     return max_id + 1
 
+def get_next_project_id():
+    projects = read_csv(PROJECTS)
 
-def get_next_user_id() -> int:
-    return _get_next_id_for(USERS, "user_id")
+    if not projects:
+        return 1
+    
+    max_id = 0
+    for project in projects:
+        project_id = int(project.get('project_id', 0))
+        if project_id > max_id:
+            max_id = project_id
+    
+    return max_id + 1
 
+def update_user_data(user_id, new_data):
+    users = read_csv(USERS)
+    updated_users_list = []
+    target_id = str(user_id) 
+    for user in users:
+        if user["user_id"] == target_id:
+            user.update(new_data)
+        updated_users_list.append(user)
+    
+    overwrite_csv(USERS, USER_FIELDNAMES, updated_users_list)
 
-def get_next_project_id() -> int:
-    return _get_next_id_for(PROJECTS, "project_id")
+def update_project_data(project_id, new_data):
+    projects = read_csv(PROJECTS)
+    updated_projects_list = []
+    target_id = str(project_id)
+ 
+    for project in projects:
+        if project.get('project_id') == target_id:
+            project.update(new_data)  # Atualiza o dicionário
+        updated_projects_list.append(project)
+     
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, updated_projects_list)
 
+def delete_project_data(project_id):
+    projects = read_csv(PROJECTS)
+    target_id = str(project_id) 
+     
+    remaining_projects = [
+        project for project in projects 
+        if project.get('project_id') != target_id
+    ]
+    
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining_projects)
 
-def get_next_task_id() -> int:
-    return _get_next_id_for(TASKS, "task_id")
+def find_project_by_id(project_id):
+    projects = read_csv(PROJECTS)
+    target_id = str(project_id) 
+    for project in projects:
+        if project.get('project_id') == target_id:
+            return project
+    return None
 
+def find_projects_by_user_id(user_id):
+    all_projects = read_csv(PROJECTS)
 
-# -------------------------
-# Users
-# -------------------------
-def save_user(user: Dict[str, Any]) -> None:
+    user = find_user_by_id(user_id)
+    
+    my_projects = []
+    target_user_id = str(user_id) 
+ 
+    for project in all_projects:
+        project_user_id = project.get('user_id')
+        if project_user_id == target_user_id:
+            project.pop('user_id')
+            project['owner_user'] = user['name']
+            my_projects.append(project)
+             
+    return my_projects
+
+def delete_user_data(user_id):
+    users = read_csv(USERS)
+    target_id = str(user_id) 
+    users = [user for user in users if user['user_id'] != target_id]
+
+    overwrite_csv(USERS,USER_FIELDNAMES,users)
+
+def save_user(user):
     save_csv(USERS, USER_FIELDNAMES, user)
 
-
-def find_user_by_email(email: str) -> Dict[str, str] | None:
-    users = read_csv(USERS)
-    for u in users:
-        if u.get("email") == email:
-            return u
-    return None
-
-
-def find_user_by_id(user_id: Any) -> Dict[str, str] | None:
-    target = str(user_id)
-    users = read_csv(USERS)
-    for u in users:
-        if u.get("user_id") == target:
-            return u
-    return None
-
-
-def update_user_data(user_id: Any, new_data: Dict[str, Any]) -> None:
-    users = read_csv(USERS)
-    target = str(user_id)
-    updated = []
-    for u in users:
-        if u.get("user_id") == target:
-            u = {**u, **{k: str(v) for k, v in new_data.items()}}
-        updated.append(u)
-    overwrite_csv(USERS, USER_FIELDNAMES, updated)
-
-
-def delete_user_data(user_id: Any) -> None:
-    users = read_csv(USERS)
-    target = str(user_id)
-    remaining = [u for u in users if u.get("user_id") != target]
-    overwrite_csv(USERS, USER_FIELDNAMES, remaining)
-
-
-# -------------------------
-# Projects
-# -------------------------
-def save_project(project: Dict[str, Any]) -> None:
+def save_project(project):
     save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
 
+def get_next_list_id():
+    lists = read_csv(LISTS)
+    if not lists:
+        return 1
+    max_id = 0
+    for list in lists:
+        lists_id = int(list.get('list_id', 0))
+        if lists_id > max_id:
+            max_id = lists_id
+    return max_id + 1
 
-def find_project_by_id(project_id: Any) -> Dict[str, str] | None:
-    target = str(project_id)
-    projects = read_csv(PROJECTS)
-    for p in projects:
-        if p.get("project_id") == target:
-            return p
+def save_list(lista_data):
+    save_csv(LISTS, LIST_FIELDNAMES, lista_data)
+
+def find_lists_by_project_id(project_id):
+    all_lists = read_csv(LISTS)
+    project_lists = []
+    target_id = str(project_id)
+    
+    for list in all_lists:
+        if list.get('project_id') == target_id:
+            project_lists.append(list)
+            
+    return project_lists
+
+def find_list_by_id(list_id):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    for list in lists:
+        if list.get('list_id') == target_id:
+            return list
     return None
 
+def delete_list_data(list_id):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    
+    # Filtra a lista mantendo apenas as que NÃO são o alvo
+    remaining_lists = [l for l in lists if l.get('list_id') != target_id]
+    
+    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining_lists)
 
-def find_projects_by_user_id(user_id: Any) -> List[Dict[str, str]]:
-    """Retorna lista de projetos do usuário. NÃO muta os dicionários originais."""
-    projects = read_csv(PROJECTS)
-    target = str(user_id)
-    result = []
-    for p in projects:
-        if p.get("user_id") == target:
-            # criar cópia para evitar mutações
-            result.append(dict(p))
-    return result
+def update_list_data(list_id, new_data):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    updated_lists = []
 
-
-def update_project_data(project_id: Any, new_data: Dict[str, Any]) -> None:
-    projects = read_csv(PROJECTS)
-    target = str(project_id)
-    updated = []
-    for p in projects:
-        if p.get("project_id") == target:
-            p = {**p, **{k: str(v) for k, v in new_data.items()}}
-        updated.append(p)
-    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, updated)
-
-
-def delete_project_data(project_id: Any) -> None:
-    projects = read_csv(PROJECTS)
-    target = str(project_id)
-    remaining = [p for p in projects if p.get("project_id") != target]
-    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining)
-
-
-# -------------------------
-# Tasks
-# -------------------------
-def save_task(task: Dict[str, Any]) -> None:
-    # Garantir que as chaves existam e sejam string
-    row = {k: ("" if task.get(k) is None else str(task.get(k))) for k in TASK_FIELDNAMES}
-    save_csv(TASKS, TASK_FIELDNAMES, row)
-
-
-def find_task_by_id(task_id: Any) -> Dict[str, str] | None:
-    target = str(task_id)
-    tasks = read_csv(TASKS)
-    for t in tasks:
-        if t.get("task_id") == target:
-            return t
-    return None
-
-
-def find_tasks_by_project(project_id: Any) -> List[Dict[str, str]]:
-    target = str(project_id).strip()
-    tasks = read_csv(TASKS)
-    result = []
-    for t in tasks:
-        if t.get("project_id", "").strip() == target:
-            result.append(dict(t))  # devolve cópia
-    return result
-
-
-def update_task_data(task_id: Any, new_data: Dict[str, Any]) -> None:
-    tasks = read_csv(TASKS)
-    target = str(task_id)
-    updated = []
-    for t in tasks:
-        if t.get("task_id") == target:
-            t = {**t, **{k: str(v) for k, v in new_data.items()}}
-        updated.append(t)
-    overwrite_csv(TASKS, TASK_FIELDNAMES, updated)
-
-
-def delete_task_data(task_id: Any) -> None:
-    tasks = read_csv(TASKS)
-    target = str(task_id)
-    remaining = [t for t in tasks if t.get("task_id") != target]
-    overwrite_csv(TASKS, TASK_FIELDNAMES, remaining)
-
-
-# -------------------------
-# FIM
-# -------------------------
+    for list in lists:
+        if list.get('list_id') == target_id:
+            list.update(new_data) # Atualiza os campos
+        updated_lists.append(list)
+    
+    overwrite_csv(LISTS, LIST_FIELDNAMES, updated_lists)
