@@ -14,7 +14,7 @@ db_path = os.path.join(main_path, 'db')
 # caminho especifico dos arquivos
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
-LISTS = os.path.join(db_path, "listas.csv")
+LISTS = os.path.join(db_path, "lists.csv")
 
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
