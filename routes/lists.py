@@ -5,6 +5,7 @@ from services.csv_service import (
     save_list, get_next_list_id, find_project_by_id, 
     find_lists_by_project_id, find_list_by_id, delete_list_data, update_list_data
 )
+
 list_route = Blueprint('/lists', __name__)
 
 # CRIAR UMA NOVA LISTA (COLUNA) PARA UM PROJETO
@@ -104,6 +105,7 @@ def delete_project_list(project_id, list_id):
 @jwt_required()
 def update_list(project_id, list_id):
     current_user_id = get_jwt_identity()
+
     # Pega o novo nome
     data = request.json
     new_name = data.get('list_name')
@@ -112,6 +114,11 @@ def update_list(project_id, list_id):
     if search_project is None:
         return jsonify(msg="Projeto não encontrado"), 404
     
+    # Pega o novo nome
+    data = request.json
+    new_name = data.get('list_name')
+
+
     if not new_name:
         return jsonify(msg="O novo nome da lista é obrigatório"), 400
 
@@ -136,4 +143,7 @@ def update_list(project_id, list_id):
 
     # Atualiza
     update_list_data(list_id, {'list_name': new_name})
+
     return jsonify(msg=f"Lista renomeada para '{new_name}' com sucesso!"), 200
+
+
