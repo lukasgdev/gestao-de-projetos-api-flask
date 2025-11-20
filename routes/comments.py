@@ -1,9 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
-
 from services.csv_service import (
-    read_csv,
     find_project_by_id,
     find_list_by_id,
     find_task_by_id,
@@ -20,7 +18,7 @@ comments_route = Blueprint("comments", __name__)
 # ============================================================
 # CREATE COMMENT
 # ============================================================
-@comments_route.post("/projects/<project_id>/lists/<list_id>/tasks/<task_id>/comments")
+@comments_route.post("/")
 @jwt_required()
 def create_comment(project_id, list_id, task_id):
 
@@ -66,7 +64,7 @@ def create_comment(project_id, list_id, task_id):
 # ============================================================
 # LIST COMMENTS
 # ============================================================
-@comments_route.get("/projects/<project_id>/lists/<list_id>/tasks/<task_id>/comments")
+@comments_route.get("/")
 @jwt_required()
 def list_comments(project_id, list_id, task_id):
 
@@ -96,7 +94,7 @@ def list_comments(project_id, list_id, task_id):
 # ============================================================
 # UPDATE COMMENT
 # ============================================================
-@comments_route.put("/projects/<project_id>/lists/<list_id>/tasks/<task_id>/comments/<comment_id>")
+@comments_route.put("/<comment_id>")
 @jwt_required()
 def update_comment(project_id, list_id, task_id, comment_id):
 
@@ -132,7 +130,7 @@ def update_comment(project_id, list_id, task_id, comment_id):
 # ============================================================
 # DELETE COMMENT
 # ============================================================
-@comments_route.delete("/projects/<project_id>/lists/<list_id>/tasks/<task_id>/comments/<comment_id>")
+@comments_route.delete("/<comment_id>")
 @jwt_required()
 def delete_comment(project_id, list_id, task_id, comment_id):
 

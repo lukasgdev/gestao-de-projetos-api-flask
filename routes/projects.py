@@ -5,7 +5,7 @@ from datetime import datetime
 
 projects_route = Blueprint('projects', __name__)
 
-@projects_route.route('/projects', methods=['POST'])
+@projects_route.route('/', methods=['POST'])
 @jwt_required()
 def create_project():
     current_user_id = get_jwt_identity()
@@ -37,7 +37,7 @@ def create_project():
 
     return jsonify(msg='Projeto criado com sucesso!'), 201
 
-@projects_route.route("/projects")
+@projects_route.route("/")
 @jwt_required()
 def get_my_projects():
     current_user_id = get_jwt_identity()
@@ -50,7 +50,7 @@ def get_my_projects():
     my_projects = find_projects_by_user_id(current_user_id)
     return jsonify(my_projects), 200
 
-@projects_route.route("/projects/<project_id>")
+@projects_route.route("/<project_id>")
 @jwt_required()
 def get_specific_project(project_id):
     current_user_id = get_jwt_identity()
@@ -73,7 +73,7 @@ def get_specific_project(project_id):
 
     return jsonify(project)
 
-@projects_route.route("/projects/<project_id>", methods=["PUT"])
+@projects_route.route("/<project_id>", methods=["PUT"])
 @jwt_required()
 def updated_project(project_id):
 
@@ -108,7 +108,7 @@ def updated_project(project_id):
 
     return jsonify(msg="Projeto atualizado com sucesso!"), 200
 
-@projects_route.route("/projects/<project_id>", methods=["DELETE"])
+@projects_route.route("/<project_id>", methods=["DELETE"])
 @jwt_required()
 def delete_project(project_id):
 

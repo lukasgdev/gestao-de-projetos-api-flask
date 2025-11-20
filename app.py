@@ -13,10 +13,10 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 jwt = JWTManager(app)
 
 app.register_blueprint(user_route)
-app.register_blueprint(projects_route, url_prefix='/user')
-app.register_blueprint(list_route, url_prefix='/user/projects')
-app.register_blueprint(tasks_route, url_prefix='/user')
-app.register_blueprint(comments_route, url_prefix='/user')
+app.register_blueprint(projects_route, url_prefix='/user/projects')
+app.register_blueprint(list_route, url_prefix='/user/projects/<project_id>/lists')
+app.register_blueprint(tasks_route, url_prefix='/user/projects/<project_id>/lists/<list_id>/tasks')
+app.register_blueprint(comments_route, url_prefix='/user/projects/<project_id>/lists/<list_id>/tasks/<task_id>/comments')
 
 @app.route("/")
 def api():

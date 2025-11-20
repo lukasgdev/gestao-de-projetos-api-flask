@@ -1,9 +1,2 @@
 task_id,title,description,status,created_on,list_id
-,,,,,
-1,teste real verdadeiro,letsgo,done,,1
-2,teste real verdadeiro dois,letsgo,done,,1
-3,teste falso de metira,letsgono,todo,,2
-,,,,,
-4,teste falso de metiraOSAO,letsgoGOOOO,todoOOOOO,,2
-5,last test,letsgoGOOOO,todoOOOOO,2025-11-19 17:13:23,4
-6,task do caba,cabaloco,todo,2025-11-19 17:27:57,5
+1,trocar a ordem de testes,bora euro truck,todo,2025-11-19 21:29:40,1

@@ -262,7 +262,7 @@ def delete_task_data(task_id):
     overwrite_csv(TASKS, TASKS_FIELDNAMES, remaining)
 
 
-#comments
+# ========== COMMENTS ==========
 
 def find_comments_by_task_id(task_id):
     comments = read_csv(COMMENTS)

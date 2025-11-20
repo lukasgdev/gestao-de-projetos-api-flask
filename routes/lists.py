@@ -6,14 +6,13 @@ from services.csv_service import (
     find_lists_by_project_id, find_list_by_id, delete_list_data, update_list_data
 )
 
-list_route = Blueprint('/lists', __name__)
-
+list_route = Blueprint('lists', __name__)
 
 # CRIAR UMA NOVA LISTA (COLUNA) PARA UM PROJETO
 
 # Ex: Criar a coluna "Aguardando Aprovação" no Projeto 1
 
-@list_route.route('/<project_id>/lists', methods=['POST'])
+@list_route.route('/', methods=['POST'])
 @jwt_required()
 def create_list_for_project(project_id):
     data = request.json
@@ -48,7 +47,7 @@ def create_list_for_project(project_id):
 
 # VER TODAS AS LISTAS DE UM PROJETO
 
-@list_route.route('/<project_id>/lists')
+@list_route.route('/')
 @jwt_required()
 def get_project_lists(project_id):
 
@@ -72,7 +71,7 @@ def get_project_lists(project_id):
     return jsonify(response), 200
 
 # DELETAR UMA LISTA DE UM PROJETO
-@list_route.route('/<project_id>/lists/<list_id>', methods=['DELETE'])
+@list_route.route('/<list_id>', methods=['DELETE'])
 @jwt_required()
 
 def delete_project_list(project_id, list_id):
@@ -102,7 +101,7 @@ def delete_project_list(project_id, list_id):
 
     return jsonify(msg="Lista deletada com sucesso!"), 200
 
-@list_route.route('/<project_id>/lists/<list_id>', methods=['PATCH'])
+@list_route.route('/<list_id>', methods=['PATCH'])
 @jwt_required()
 def update_list(project_id, list_id):
     current_user_id = get_jwt_identity()

@@ -12,13 +12,12 @@ from services.csv_service import (
     find_project_by_id,
     find_list_by_id,
 )
-from services.csv_service import TASKS
 
 
 tasks_route = Blueprint("tasks", __name__)
 
 
-@tasks_route.post("/projects/<project_id>/lists/<list_id>/tasks")
+@tasks_route.post("/")
 @jwt_required()
 def create_task(project_id, list_id):
 
@@ -58,7 +57,7 @@ def create_task(project_id, list_id):
 
 
 
-@tasks_route.get("/projects/<project_id>/lists/<list_id>/tasks")
+@tasks_route.get("/")
 @jwt_required()
 def list_tasks(project_id, list_id):
 
@@ -79,7 +78,7 @@ def list_tasks(project_id, list_id):
     return jsonify({"tasks": tasks}), 200
 
 
-@tasks_route.put("/projects/<project_id>/lists/<list_id>/tasks/<task_id>")
+@tasks_route.put("/<task_id>")
 @jwt_required()
 def update_task(project_id, list_id, task_id):
 
@@ -112,7 +111,7 @@ def update_task(project_id, list_id, task_id):
     return jsonify({"msg": "Task atualizada com sucesso!"}), 200
 
 
-@tasks_route.delete("/projects/<project_id>/lists/<list_id>/tasks/<task_id>")
+@tasks_route.delete("/<task_id>")
 @jwt_required()
 def delete_task(project_id, list_id, task_id):
 
