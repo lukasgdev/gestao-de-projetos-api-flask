@@ -14,12 +14,15 @@ db_path = os.path.join(main_path, 'db')
 # caminho especifico dos arquivos
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
+<<<<<<< HEAD
 
+=======
+>>>>>>> 44416a0e17b11792dc83010d5043ae238f01c982
 LISTS = os.path.join(db_path, "lists.csv")
 
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
-
+LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
 
 def save_csv (arq, fieldnames, data):
     with open(arq, 'a', encoding='utf-8', newline='') as file:
@@ -161,3 +164,57 @@ def save_user(user):
 
 def save_project(project):
     save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
+
+def get_next_list_id():
+    lists = read_csv(LISTS)
+    if not lists:
+        return 1
+    max_id = 0
+    for list in lists:
+        lists_id = int(list.get('list_id', 0))
+        if lists_id > max_id:
+            max_id = lists_id
+    return max_id + 1
+
+def save_list(lista_data):
+    save_csv(LISTS, LIST_FIELDNAMES, lista_data)
+
+def find_lists_by_project_id(project_id):
+    all_lists = read_csv(LISTS)
+    project_lists = []
+    target_id = str(project_id)
+    
+    for list in all_lists:
+        if list.get('project_id') == target_id:
+            project_lists.append(list)
+            
+    return project_lists
+
+def find_list_by_id(list_id):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    for list in lists:
+        if list.get('list_id') == target_id:
+            return list
+    return None
+
+def delete_list_data(list_id):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    
+    # Filtra a lista mantendo apenas as que NÃO são o alvo
+    remaining_lists = [l for l in lists if l.get('list_id') != target_id]
+    
+    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining_lists)
+
+def update_list_data(list_id, new_data):
+    lists = read_csv(LISTS)
+    target_id = str(list_id)
+    updated_lists = []
+
+    for list in lists:
+        if list.get('list_id') == target_id:
+            list.update(new_data) # Atualiza os campos
+        updated_lists.append(list)
+    
+    overwrite_csv(LISTS, LIST_FIELDNAMES, updated_lists)

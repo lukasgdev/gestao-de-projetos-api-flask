@@ -118,7 +118,6 @@ def update_list(project_id, list_id):
     data = request.json
     new_name = data.get('list_name')
 
-
     if not new_name:
         return jsonify(msg="O novo nome da lista é obrigatório"), 400
 
