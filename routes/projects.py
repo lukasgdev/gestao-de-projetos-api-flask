@@ -45,7 +45,10 @@ def get_my_projects():
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"msg": "Usuário não encontrado"}), 404    
+        return jsonify({"msg": "Usuário não encontrado"}), 404
+
+    if not my_projects:
+        return jsonify(msg="Você não possui projetos criados."), 200    
 
     my_projects = find_projects_by_user_id(current_user_id)
     return jsonify(my_projects), 200
