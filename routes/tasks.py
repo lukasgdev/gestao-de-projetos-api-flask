@@ -47,7 +47,7 @@ def create_task(project_id, list_id):
         "task_id": str(new_task_id),
         "title": data.get("title", ""),
         "description": data.get("description", ""),
-        "status": data.get("status", "todo"),
+        "completed": data.get("status", False),
         "created_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 
         "list_id": str(list_id),
     }

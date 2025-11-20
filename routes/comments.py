@@ -87,6 +87,9 @@ def list_comments(project_id, list_id, task_id):
 
     comments = find_comments_by_task_id(task_id)
 
+    if not comments:
+        return jsonify(msg="Nenhum comentário encontrado para esta task."), 200
+
     return jsonify({"comments": comments}), 200
 
 

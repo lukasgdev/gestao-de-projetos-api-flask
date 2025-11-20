@@ -21,11 +21,11 @@ COMMENTS = os.path.join(db_path, "comments.csv")
 USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
 PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description', 'created_on']
 LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
-TASKS_FIELDNAMES = ['task_id', 'title', 'description', 'status', 'created_on', 'list_id']
+TASKS_FIELDNAMES = ['task_id', 'title', 'description', 'completed', 'created_on', 'list_id']
 COMMENTS_FIELDNAMES =['comment_id','task_id','content','created_on']
 
 
-# ========= FUNÇÕES GENÉRICAS DE CSV ==========
+# funcoes gerais de manipulação de CSV
 
 def save_csv(arq, fieldnames, data):
     with open(arq, "a", encoding="utf-8", newline="") as file:
@@ -53,7 +53,7 @@ def read_csv(arq):
         return []
 
 
-# ========== USERS ==========
+# usuarios
 
 def save_user(user):
     save_csv(USERS, USER_FIELDNAMES, user)
@@ -104,7 +104,7 @@ def delete_user_data(user_id):
     overwrite_csv(USERS, USER_FIELDNAMES, remaining)
 
 
-# ========== PROJECTS ==========
+# projetos
 
 def save_project(project):
     save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
@@ -162,7 +162,7 @@ def delete_project_data(project_id):
     overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining)
 
 
-# ========== LISTS ==========
+# listas
 
 def get_next_list_id():
     lists_data = read_csv(LISTS)
@@ -211,7 +211,7 @@ def delete_list_data(list_id):
     overwrite_csv(LISTS, LIST_FIELDNAMES, remaining)
 
 
-# ========== TASKS ==========
+# tarefas
 
 def get_next_task_id():
     tasks = read_csv(TASKS)
@@ -262,7 +262,7 @@ def delete_task_data(task_id):
     overwrite_csv(TASKS, TASKS_FIELDNAMES, remaining)
 
 
-# ========== COMMENTS ==========
+# comentarios
 
 def find_comments_by_task_id(task_id):
     comments = read_csv(COMMENTS)
@@ -293,7 +293,7 @@ def update_comment_data(comment_id, new_content):
             break
 
     if updated:
-        save_csv(COMMENTS, COMMENTS_FIELDNAMES, comments)
+        overwrite_csv(COMMENTS, COMMENTS_FIELDNAMES, comments)
 
     return updated
 
@@ -305,5 +305,5 @@ def delete_comment_data(comment_id):
     if len(new_comments) == len(comments):
         return False  # não deletou nada
 
-    save_csv(COMMENTS, COMMENTS_FIELDNAMES, new_comments)
+    overwrite_csv(COMMENTS, COMMENTS_FIELDNAMES, new_comments)
     return True
