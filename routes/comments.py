@@ -22,7 +22,7 @@ comments_route = Blueprint("comments", __name__)
 @jwt_required()
 def create_comment(project_id, list_id, task_id):
     """
-    Criar uma nova task
+    Criar um novo comentario
     ---
     tags:
       - comments
@@ -90,17 +90,17 @@ def create_comment(project_id, list_id, task_id):
 @jwt_required()
 def list_comments(project_id, list_id, task_id):
     """
-    Listar todas as tasks de uma lista
+    Listar todas os comentarios de uma task
     ---
     tags:
       - comments
     responses:
       200:
-        description: Lista de tasks retornada
+        description: Lista de comentarios retornada
       403:
         description: Sem permissão
       404:
-        description: Lista não encontrada
+        description: comentario não encontrado
     """
     current_user_id = get_jwt_identity()
 
@@ -149,7 +149,7 @@ def update_comment(project_id, list_id, task_id, comment_id):
               type: string
     responses:
       200:
-        description: comentario atualizada
+        description: comentario atualizado
       400:
         description: Dados inválidos
       404:
