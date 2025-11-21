@@ -20,7 +20,31 @@ tasks_route = Blueprint("tasks", __name__)
 @tasks_route.post("/")
 @jwt_required()
 def create_task(project_id, list_id):
-
+    """
+    Criar uma nova task
+    ---
+    tags:
+      - Tasks
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+            completed:
+              type: boolean
+    responses:
+      201:
+        description: Task criada com sucesso
+      400:
+        description: Erro nos dados enviados
+      404:
+        description: Projeto ou lista não encontrada
+    """
     current_user_id = get_jwt_identity()
     data = request.get_json()
 
@@ -60,7 +84,19 @@ def create_task(project_id, list_id):
 @tasks_route.get("/")
 @jwt_required()
 def list_tasks(project_id, list_id):
-
+    """
+    Listar todas as tasks de uma lista
+    ---
+    tags:
+      - Tasks
+    responses:
+      200:
+        description: Lista de tasks retornada
+      403:
+        description: Sem permissão
+      404:
+        description: Lista não encontrada
+    """
     current_user_id = get_jwt_identity()
 
     #verifica projeto
@@ -81,6 +117,31 @@ def list_tasks(project_id, list_id):
 @tasks_route.put("/<task_id>")
 @jwt_required()
 def update_task(project_id, list_id, task_id):
+    """
+    Atualizar uma task
+    ---
+    tags:
+      - Tasks
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+            completed:
+              type: boolean
+    responses:
+      200:
+        description: Task atualizada
+      400:
+        description: Dados inválidos
+      404:
+        description: Task não encontrada
+    """
 
     current_user_id = get_jwt_identity()
     data = request.get_json()
@@ -114,7 +175,17 @@ def update_task(project_id, list_id, task_id):
 @tasks_route.delete("/<task_id>")
 @jwt_required()
 def delete_task(project_id, list_id, task_id):
-
+    """
+    Deletar uma task
+    ---
+    tags:
+      - Tasks
+    responses:
+      200:
+        description: Task deletada
+      404:
+        description: Task não encontrada
+    """
     current_user_id = get_jwt_identity()
 
     task = find_task_by_id(task_id)

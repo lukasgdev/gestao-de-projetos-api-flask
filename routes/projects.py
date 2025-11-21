@@ -8,6 +8,30 @@ projects_route = Blueprint('projects', __name__)
 @projects_route.route('/', methods=['POST'])
 @jwt_required()
 def create_project():
+    """
+    criacao de um projeto
+    ---
+    tags:
+        - Projects
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            project_title:
+              type: string
+            project_description:
+              type: string
+    responses:
+      201:
+        description: Projeto criado
+      400:
+        description: Dados inválidos
+      404:
+        description: Usuário não encontrado
+    """
+    
     current_user_id = get_jwt_identity()
 
     user = find_user_by_id(current_user_id)
@@ -40,6 +64,17 @@ def create_project():
 @projects_route.route("/")
 @jwt_required()
 def get_my_projects():
+    """
+    Listar todos os meus projetos
+    ---
+    tags:
+      - Projects
+    responses:
+      200:
+        description: Lista de projetos retornada
+      404:
+        description: Usuário não encontrado
+    """
     current_user_id = get_jwt_identity()
 
     user = find_user_by_id(current_user_id)
@@ -53,6 +88,22 @@ def get_my_projects():
 @projects_route.route("/<project_id>")
 @jwt_required()
 def get_specific_project(project_id):
+    """
+    Obter um projeto específico
+    ---
+    tags:
+      - Projects
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+    responses:
+      200:
+        description: Projeto retornado
+      404:
+        description: Não encontrado ou sem permissão
+    """
     current_user_id = get_jwt_identity()
 
     user = find_user_by_id(current_user_id)
@@ -76,7 +127,31 @@ def get_specific_project(project_id):
 @projects_route.route("/<project_id>", methods=["PUT"])
 @jwt_required()
 def updated_project(project_id):
-
+    """
+    Atualizar um projeto
+    ---
+    tags:
+      - Projects
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            project_title:
+              type: string
+            project_description:
+              type: string
+    responses:
+      200:
+        description: Projeto atualizado
+      400:
+        description: Título obrigatório
+      403:
+        description: Sem permissão
+      404:
+        description: Projeto não encontrado
+    """
     current_user_id = get_jwt_identity()
 
     user = find_user_by_id(current_user_id)
@@ -111,6 +186,19 @@ def updated_project(project_id):
 @projects_route.route("/<project_id>", methods=["DELETE"])
 @jwt_required()
 def delete_project(project_id):
+    """
+    Deletar um projeto
+    ---
+    tags:
+      - Projects
+    responses:
+      200:
+        description: Projeto deletado
+      403:
+        description: Sem permissão
+      404:
+        description: Projeto não encontrado
+    """
 
     current_user_id = get_jwt_identity()
 

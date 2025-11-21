@@ -15,6 +15,33 @@ list_route = Blueprint('lists', __name__)
 @list_route.route('/', methods=['POST'])
 @jwt_required()
 def create_list_for_project(project_id):
+    """
+    Criar uma nova lista em um projeto
+    ---
+    tags:
+      - Lists
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            list_name:
+              type: string
+    responses:
+      201:
+        description: Lista criada
+      400:
+        description: Nome obrigatório
+      403:
+        description: Sem permissão
+      404:
+        description: Projeto não encontrado
+    """
     data = request.json
     list_name = data.get('list_name')
     
@@ -50,7 +77,22 @@ def create_list_for_project(project_id):
 @list_route.route('/')
 @jwt_required()
 def get_project_lists(project_id):
-
+    """
+    Listar todas as listas de um projeto
+    ---
+    tags:
+      - Lists
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+    responses:
+      200:
+        description: Listas retornadas
+      404:
+        description: Projeto não encontrado
+    """
     project = find_project_by_id(project_id)
 
     if not project:
@@ -75,6 +117,30 @@ def get_project_lists(project_id):
 @jwt_required()
 
 def delete_project_list(project_id, list_id):
+    """
+    Deletar uma lista de um projeto
+    ---
+    tags:
+      - Lists
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+    responses:
+      200:
+        description: Lista deletada
+      400:
+        description: Lista não pertence ao projeto
+      403:
+        description: Sem permissão
+      404:
+        description: Lista ou projeto não encontrado
+    """
     current_user_id = get_jwt_identity()
 
     # Verifica se a lista existe
@@ -104,6 +170,37 @@ def delete_project_list(project_id, list_id):
 @list_route.route('/<list_id>', methods=['PATCH'])
 @jwt_required()
 def update_list(project_id, list_id):
+    """
+    Atualizar o nome de uma lista
+    ---
+    tags:
+      - Lists
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            list_name:
+              type: string
+    responses:
+      200:
+        description: Lista atualizada
+      400:
+        description: Nome obrigatório ou lista inválida
+      403:
+        description: Sem permissão
+      404:
+        description: Lista ou projeto não encontrado
+    """
     current_user_id = get_jwt_identity()
     
     # Pega o novo nome

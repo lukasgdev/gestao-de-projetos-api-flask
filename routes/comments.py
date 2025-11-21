@@ -21,7 +21,29 @@ comments_route = Blueprint("comments", __name__)
 @comments_route.post("/")
 @jwt_required()
 def create_comment(project_id, list_id, task_id):
-
+    """
+    Criar uma nova task
+    ---
+    tags:
+      - comments
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            content:
+              type: string
+    responses:
+      201:
+        description: comentario criado com sucesso
+      400:
+        description: sem conteudo
+      404:
+        description: projeto,lista ou task não encontrada
+      403:
+        description: sem permissão
+    """
     current_user_id = get_jwt_identity()
     data = request.get_json()
 
@@ -67,7 +89,19 @@ def create_comment(project_id, list_id, task_id):
 @comments_route.get("/")
 @jwt_required()
 def list_comments(project_id, list_id, task_id):
-
+    """
+    Listar todas as tasks de uma lista
+    ---
+    tags:
+      - comments
+    responses:
+      200:
+        description: Lista de tasks retornada
+      403:
+        description: Sem permissão
+      404:
+        description: Lista não encontrada
+    """
     current_user_id = get_jwt_identity()
 
     # verifica projeto
@@ -100,7 +134,27 @@ def list_comments(project_id, list_id, task_id):
 @comments_route.put("/<comment_id>")
 @jwt_required()
 def update_comment(project_id, list_id, task_id, comment_id):
-
+    """
+    Atualizar um comentario
+    ---
+    tags:
+      - comments
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            content:
+              type: string
+    responses:
+      200:
+        description: comentario atualizada
+      400:
+        description: Dados inválidos
+      404:
+        description: comentario não encontrado
+    """
     current_user_id = get_jwt_identity()
     data = request.get_json()
 
@@ -136,7 +190,17 @@ def update_comment(project_id, list_id, task_id, comment_id):
 @comments_route.delete("/<comment_id>")
 @jwt_required()
 def delete_comment(project_id, list_id, task_id, comment_id):
-
+    """
+    Deletar um comentario
+    ---
+    tags:
+      - comments
+    responses:
+      200:
+        description: comentario deletado
+      404:
+        description: comentario não encontrado
+    """
     current_user_id = get_jwt_identity()
 
     # verifica projeto

@@ -6,11 +6,27 @@ from routes.projects import projects_route
 from routes.lists import list_route
 from routes.tasks import tasks_route
 from routes.comments import comments_route
+from flasgger import Swagger
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "8d5111adeddaafe18a2118d05d12281ffd05af27248cabccbde3dec49d9e987f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 jwt = JWTManager(app)
+
+swagger_template = {
+    "info": {
+        "title": "API de Gestão de Projetos",
+        "version": "1.0",
+        "description": "API para gerenciar projetos, estilo trello",
+        "contact": {
+            "name": "Vitor Henrique | Lukas Gomes | Allysson Ferreira",
+        }
+    },
+    
+}
+
+swagger = Swagger(app, template=swagger_template)
+
 
 app.register_blueprint(user_route)
 app.register_blueprint(projects_route, url_prefix='/user/projects')
@@ -20,6 +36,14 @@ app.register_blueprint(comments_route, url_prefix='/user/projects/<project_id>/l
 
 @app.route("/")
 def api():
+    """
+    API ESTA FUNCIONANDO
+    ---
+    responses:
+        200:
+            description: API funcionando corretamente
+    """
+    
     return jsonify(msg="Api funcionando.")
 
 if __name__ == '__main__':
