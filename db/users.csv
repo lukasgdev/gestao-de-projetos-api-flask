@@ -1,0 +1,2 @@
+user_id,name,email,password_hash,created_on
+1,al,al@gmail.com,scrypt:32768:8:1$DNqlw1LqpZkr229K$7e3332ec2a58682c61ce7f1ac1d4dcccbef675743183f92984d626a1ff922beee1f4cd980496630a103c2b90f68bb4fc09eecaebc7781038a5a4a566df914736,2025-11-20 20:20:42
