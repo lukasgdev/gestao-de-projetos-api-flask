@@ -1,0 +1,2 @@
+user_id,name,email,password_hash,created_at
+1,João Silva,usuario@email.com,scrypt:32768:8:1$wBXQIYLq8XG7wvrz$b81c8ab9bcc52982cea0b56bd157c2cc6eae220d2e3af8f1bd55e957fc3d19cd90d09f18bc30280eb37c90ec6c200b95920406d524dc29654da74ae1ab38efb5,2025-11-21 23:51:46

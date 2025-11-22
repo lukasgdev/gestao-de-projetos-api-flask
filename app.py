@@ -28,13 +28,13 @@ swagger_template = {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header",
-            "description": "Cole seu ACCESS TOKEN aqui. Ex: Bearer eyJ..."
+            "description": "Cole o ACCESS TOKEN aqui"
         },
-        "RefreshTokenAuth": {
+        "RefreshToken": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header",
-            "description": "Cole seu REFRESH TOKEN aqui. Ex: Bearer eyJ..."
+            "description": "Cole o REFRESH TOKEN aqui"
         }
     },
     

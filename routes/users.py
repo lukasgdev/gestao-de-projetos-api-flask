@@ -129,7 +129,7 @@ def refresh_token():
     tags:
       - Users
     security:
-      - Bearer: []
+      - RefreshToken: []
     responses:
       200:
         description: Novo access token gerado
