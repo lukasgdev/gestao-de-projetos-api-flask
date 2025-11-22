@@ -6,6 +6,7 @@ from routes.projects import projects_route
 from routes.lists import list_route
 
 app = Flask(__name__)
+app.json.sort_keys = False
 app.config["JWT_SECRET_KEY"] = "8d5111adeddaafe18a2118d05d12281ffd05af27248cabccbde3dec49d9e987f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 jwt = JWTManager(app)
