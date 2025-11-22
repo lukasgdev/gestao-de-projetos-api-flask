@@ -20,6 +20,8 @@ def create_list_for_project(project_id):
     ---
     tags:
       - Lists
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: project_id
@@ -64,7 +66,7 @@ def create_list_for_project(project_id):
         "list_id": get_next_list_id(),
         "project_id": project_id,
         "list_name": list_name,
-        "created_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     
     save_list(new_list)
@@ -82,6 +84,8 @@ def get_project_lists(project_id):
     ---
     tags:
       - Lists
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: project_id
@@ -93,6 +97,7 @@ def get_project_lists(project_id):
       404:
         description: Projeto não encontrado
     """
+    
     project = find_project_by_id(project_id)
 
     if not project:
@@ -122,6 +127,8 @@ def delete_project_list(project_id, list_id):
     ---
     tags:
       - Lists
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: project_id
@@ -175,6 +182,8 @@ def update_list(project_id, list_id):
     ---
     tags:
       - Lists
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: project_id

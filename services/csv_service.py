@@ -18,11 +18,11 @@ TASKS = os.path.join(db_path, "tasks.csv")
 COMMENTS = os.path.join(db_path, "comments.csv")
 
 # fieldnames
-USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
-PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description', 'created_on']
-LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
-TASKS_FIELDNAMES = ['task_id', 'title', 'description', 'completed', 'created_on', 'list_id']
-COMMENTS_FIELDNAMES =['comment_id','task_id','content','created_on']
+USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_at']
+PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description', 'created_at']
+LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_at']
+TASKS_FIELDNAMES = ['task_id', 'title', 'description', 'completed', 'created_at', 'list_id']
+COMMENTS_FIELDNAMES =['comment_id','task_id','content','created_at']
 
 
 # funcoes gerais de manipulação de CSV
@@ -98,10 +98,16 @@ def update_user_data(user_id, new_data):
 
 
 def delete_user_data(user_id):
-    target_id = str(user_id)
+    target_user_id = str(user_id)
+    
+    all_projects = read_csv(PROJECTS)
+    for p in all_projects:
+        if str(p.get('user_id')) == target_user_id:
+            delete_project_data(p['project_id'])
+
     users = read_csv(USERS)
-    remaining = [u for u in users if u.get("user_id") != target_id]
-    overwrite_csv(USERS, USER_FIELDNAMES, remaining)
+    remaining_users = [u for u in users if str(u.get("user_id")) != target_user_id]
+    overwrite_csv(USERS, USER_FIELDNAMES, remaining_users)
 
 
 # projetos
@@ -154,12 +160,18 @@ def update_project_data(project_id, new_data):
 
     overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, updated)
 
-
 def delete_project_data(project_id):
-    target_id = str(project_id)
+    target_proj_id = str(project_id)
+    all_lists = read_csv(LISTS)
+
+    lists_to_remove = [l for l in all_lists if str(l.get('project_id')) == target_proj_id]
+    
+    for lista in lists_to_remove:
+        delete_list_data(lista['list_id'])
+
     projects = read_csv(PROJECTS)
-    remaining = [p for p in projects if p.get("project_id") != target_id]
-    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining)
+    remaining_projects = [p for p in projects if str(p.get("project_id")) != target_proj_id]
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining_projects)
 
 
 # listas
@@ -203,12 +215,18 @@ def update_list_data(list_id, new_data):
 
     overwrite_csv(LISTS, LIST_FIELDNAMES, updated)
 
-
 def delete_list_data(list_id):
-    target_id = str(list_id)
+    target_list_id = str(list_id)
+    all_tasks = read_csv(TASKS)
+    
+    tasks_in_list = [t for t in all_tasks if str(t.get('list_id')) == target_list_id]
+    
+    for task in tasks_in_list:
+        delete_task_data(task['task_id'])
+
     lists_data = read_csv(LISTS)
-    remaining = [l for l in lists_data if l.get("list_id") != target_id]
-    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining)
+    remaining_lists = [l for l in lists_data if str(l.get("list_id")) != target_list_id]
+    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining_lists)
 
 
 # tarefas
@@ -230,6 +248,10 @@ def save_task(task):
 def find_tasks_by_list_id(list_id):
     target_id = str(list_id)
     tasks = read_csv(TASKS)
+
+    if not tasks:
+        return 'Nenhuma task encontrada'
+
     return [t for t in tasks if t.get("list_id") == target_id]
 
 
@@ -256,10 +278,17 @@ def update_task_data(task_id, new_data):
 
 
 def delete_task_data(task_id):
-    target_id = str(task_id)
-    tasks = read_csv(TASKS)
-    remaining = [t for t in tasks if t.get("task_id") != target_id]
-    overwrite_csv(TASKS, TASKS_FIELDNAMES, remaining)
+    target_task_id = str(task_id)
+    all_comments = read_csv(COMMENTS)
+    
+    comments_to_remove = [c for c in all_comments if str(c.get('task_id')) == target_task_id]
+    
+    for comment in comments_to_remove:
+        delete_comment_data(comment['comment_id'])
+
+    all_tasks = read_csv(TASKS)
+    remaining_tasks = [t for t in all_tasks if str(t.get("task_id")) != target_task_id]
+    overwrite_csv(TASKS, TASKS_FIELDNAMES, remaining_tasks)
 
 
 # comentarios
@@ -301,9 +330,4 @@ def update_comment_data(comment_id, new_content):
 def delete_comment_data(comment_id):
     comments = read_csv(COMMENTS)
     new_comments = [c for c in comments if str(c["comment_id"]) != str(comment_id)]
-
-    if len(new_comments) == len(comments):
-        return False  # não deletou nada
-
     overwrite_csv(COMMENTS, COMMENTS_FIELDNAMES, new_comments)
-    return True

@@ -17,7 +17,7 @@ from services.csv_service import (
 tasks_route = Blueprint("tasks", __name__)
 
 
-@tasks_route.post("/")
+@tasks_route.route("/", methods=["POST"])
 @jwt_required()
 def create_task(project_id, list_id):
     """
@@ -25,7 +25,17 @@ def create_task(project_id, list_id):
     ---
     tags:
       - Tasks
+    security:
+      - Bearer: []
     parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
       - in: body
         name: body
         schema:
@@ -71,8 +81,8 @@ def create_task(project_id, list_id):
         "task_id": str(new_task_id),
         "title": data.get("title", ""),
         "description": data.get("description", ""),
-        "completed": data.get("status", False),
-        "created_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 
+        "completed": False,
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 
         "list_id": str(list_id),
     }
 
@@ -89,6 +99,17 @@ def list_tasks(project_id, list_id):
     ---
     tags:
       - Tasks
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
     responses:
       200:
         description: Lista de tasks retornada
@@ -122,7 +143,21 @@ def update_task(project_id, list_id, task_id):
     ---
     tags:
       - Tasks
+    security:
+      - Bearer: []
     parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
       - in: body
         name: body
         schema:
@@ -165,7 +200,7 @@ def update_task(project_id, list_id, task_id):
     new_data = {
         "title": data.get("title", task["title"]),
         "description": data.get("description", task["description"]),
-        "status": data.get("status", task["status"]),
+        "completed": data.get("completed", task["completed"]),
     }
 
     update_task_data(task_id, new_data)
@@ -180,6 +215,21 @@ def delete_task(project_id, list_id, task_id):
     ---
     tags:
       - Tasks
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
     responses:
       200:
         description: Task deletada

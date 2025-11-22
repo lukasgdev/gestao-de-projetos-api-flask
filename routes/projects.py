@@ -13,6 +13,8 @@ def create_project():
     ---
     tags:
         - Projects
+    security:
+      - Bearer: []
     parameters:
       - in: body
         name: body
@@ -54,7 +56,7 @@ def create_project():
         "user_id": current_user_id,
         "project_title": title,
         "project_description": description,
-        "created_on": create,
+        "created_at": create,
     }
 
     save_project(new_project)
@@ -69,20 +71,24 @@ def get_my_projects():
     ---
     tags:
       - Projects
+    security:
+      - Bearer: []
     responses:
       200:
         description: Lista de projetos retornada
-      404:
-        description: Usuário não encontrado
     """
     current_user_id = get_jwt_identity()
 
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"msg": "Usuário não encontrado"}), 404    
+        return jsonify({"msg": "Nenhum usuario logado"}), 401   
 
     my_projects = find_projects_by_user_id(current_user_id)
+
+    if not my_projects:
+        return jsonify(msg="Nenhum projeto criado"), 200
+    
     return jsonify(my_projects), 200
 
 @projects_route.route("/<project_id>")
@@ -93,6 +99,8 @@ def get_specific_project(project_id):
     ---
     tags:
       - Projects
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: project_id
@@ -132,7 +140,13 @@ def updated_project(project_id):
     ---
     tags:
       - Projects
+    security:
+      - Bearer: []
     parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
       - in: body
         name: body
         schema:
@@ -191,6 +205,13 @@ def delete_project(project_id):
     ---
     tags:
       - Projects
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
     responses:
       200:
         description: Projeto deletado

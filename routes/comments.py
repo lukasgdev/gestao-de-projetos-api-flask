@@ -18,7 +18,7 @@ comments_route = Blueprint("comments", __name__)
 # ============================================================
 # CREATE COMMENT
 # ============================================================
-@comments_route.post("/")
+@comments_route.route("/", methods=["POST"])
 @jwt_required()
 def create_comment(project_id, list_id, task_id):
     """
@@ -26,7 +26,21 @@ def create_comment(project_id, list_id, task_id):
     ---
     tags:
       - comments
+    security:
+      - Bearer: []
     parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
       - in: body
         name: body
         schema:
@@ -75,7 +89,7 @@ def create_comment(project_id, list_id, task_id):
         "comment_id": str(new_comment_id),
         "task_id": str(task_id),
         "content": data["content"],
-        "created_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
     save_comment(new_comment)
@@ -86,7 +100,7 @@ def create_comment(project_id, list_id, task_id):
 # ============================================================
 # LIST COMMENTS
 # ============================================================
-@comments_route.get("/")
+@comments_route.route("/", methods=["GET"])
 @jwt_required()
 def list_comments(project_id, list_id, task_id):
     """
@@ -94,6 +108,21 @@ def list_comments(project_id, list_id, task_id):
     ---
     tags:
       - comments
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
     responses:
       200:
         description: Lista de comentarios retornada
@@ -131,7 +160,7 @@ def list_comments(project_id, list_id, task_id):
 # ============================================================
 # UPDATE COMMENT
 # ============================================================
-@comments_route.put("/<comment_id>")
+@comments_route.route("/<comment_id>", methods=["PUT"])
 @jwt_required()
 def update_comment(project_id, list_id, task_id, comment_id):
     """
@@ -139,7 +168,25 @@ def update_comment(project_id, list_id, task_id, comment_id):
     ---
     tags:
       - comments
+    security:
+      - Bearer: []
     parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
+      - in: path
+        name: comment_id
+        required: true
+        type: string
       - in: body
         name: body
         schema:
@@ -187,7 +234,7 @@ def update_comment(project_id, list_id, task_id, comment_id):
 # ============================================================
 # DELETE COMMENT
 # ============================================================
-@comments_route.delete("/<comment_id>")
+@comments_route.route("/<comment_id>", methods=["DELETE"])
 @jwt_required()
 def delete_comment(project_id, list_id, task_id, comment_id):
     """
@@ -195,6 +242,25 @@ def delete_comment(project_id, list_id, task_id, comment_id):
     ---
     tags:
       - comments
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
+      - in: path
+        name: comment_id
+        required: true
+        type: string
     responses:
       200:
         description: comentario deletado
@@ -218,8 +284,6 @@ def delete_comment(project_id, list_id, task_id, comment_id):
     if not task or str(task["list_id"]) != str(list_id):
         return jsonify({"msg": "Task inválida"}), 400
 
-    deleted = delete_comment_data(comment_id)
-    if not deleted:
-        return jsonify({"msg": "Comentário não encontrado"}), 404
+    delete_comment_data(comment_id)
 
     return jsonify({"msg": "Comentário deletado com sucesso!"}), 200

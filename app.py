@@ -9,6 +9,7 @@ from routes.comments import comments_route
 from flasgger import Swagger
 
 app = Flask(__name__)
+app.json.sort_keys = False
 app.config["JWT_SECRET_KEY"] = "8d5111adeddaafe18a2118d05d12281ffd05af27248cabccbde3dec49d9e987f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 jwt = JWTManager(app)
@@ -20,6 +21,20 @@ swagger_template = {
         "description": "API para gerenciar projetos, estilo trello",
         "contact": {
             "name": "Vitor Henrique | Lukas Gomes | Allysson Ferreira",
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Cole seu ACCESS TOKEN aqui. Ex: Bearer eyJ..."
+        },
+        "RefreshTokenAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Cole seu REFRESH TOKEN aqui. Ex: Bearer eyJ..."
         }
     },
     
@@ -45,6 +60,24 @@ def api():
     """
     
     return jsonify(msg="Api funcionando.")
+
+@jwt.expired_token_loader
+def my_expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        "msg": "Sua sessão expirou. Por favor, faça login novamente.",
+    }), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({
+        "msg": "Sessão inválida. Por favor, faça login para continuar.",
+    }), 422
+
+@jwt.unauthorized_loader
+def my_missing_token_callback(error):
+    return jsonify({
+        "msg": "Nenhum token encontrado. Por favor, faça login para continuar.",
+    }), 401
 
 if __name__ == '__main__':
     app.run(debug=True)

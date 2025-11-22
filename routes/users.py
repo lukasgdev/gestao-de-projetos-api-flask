@@ -56,7 +56,7 @@ def create_user():
         "name": name,
         "password_hash": password_hash,
         "email": email,
-        "created_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
     save_user(new_user)
@@ -169,13 +169,13 @@ def user_info():
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"msg": "Usuário não encontrado"}), 404
+        return jsonify({"msg": "Nenhum usuario logado"}), 404
     
     return jsonify({
         "id": user.get("user_id"),
         "nome": user.get("name"),
         "email": user.get("email"),
-        "criado_em": user.get('created_on')
+        "criado_em": user.get('created_at')
     }), 200
 
 
