@@ -1,27 +1,34 @@
-# funções para ler, escrever, gerar ID e etc para os arquivos CSV
 import os
 import csv
 
 # caminho da pasta atual
 current_path = os.path.dirname(os.path.abspath(__file__))
 
-# caminho da pasta raiz do projeto
+# caminho da pasta raiz
 main_path = os.path.dirname(current_path)
 
-# caminho para a pasta 'db' com os arquivos csv
-db_path = os.path.join(main_path, 'db')
+# pasta db
+db_path = os.path.join(main_path, "db")
 
-# caminho especifico dos arquivos
+# caminhos individuais
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
 LISTS = os.path.join(db_path, "lists.csv")
+TASKS = os.path.join(db_path, "tasks.csv")
+COMMENTS = os.path.join(db_path, "comments.csv")
 
-USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_on']
-PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description','created_on']
-LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_on']
+# fieldnames
+USER_FIELDNAMES = ['user_id', 'name', 'email', 'password_hash', 'created_at']
+PROJECT_FIELDNAMES = ['project_id', 'user_id', 'project_title', 'project_description', 'created_at']
+LIST_FIELDNAMES = ['list_id', 'project_id', 'list_name', 'created_at']
+TASKS_FIELDNAMES = ['task_id', 'title', 'description', 'completed', 'created_at', 'list_id']
+COMMENTS_FIELDNAMES =['comment_id','task_id','content','created_at']
 
-def save_csv (arq, fieldnames, data):
-    with open(arq, 'a', encoding='utf-8', newline='') as file:
+
+# funcoes gerais de manipulação de CSV
+
+def save_csv(arq, fieldnames, data):
+    with open(arq, "a", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
 
         if os.path.getsize(arq) == 0:
@@ -29,188 +36,298 @@ def save_csv (arq, fieldnames, data):
 
         writer.writerow(data)
 
+
 def overwrite_csv(arq, fieldnames, data_list):
-    with open(arq, 'w', encoding='utf-8', newline='') as file:
+    with open(arq, "w", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
-        
         writer.writeheader()
-    
         writer.writerows(data_list)
 
-def read_csv (arq):
+
+def read_csv(arq):
     try:
-        with open(arq, 'r', encoding='utf-8') as file:
+        with open(arq, "r", encoding="utf-8") as file:
             reader = csv.DictReader(file)
             return list(reader)
-    except Exception as e:
-        print(f'Erro ao ler o CSV {arq}: {e}')
+    except Exception:
         return []
-    
-def find_user_by_email(email):
-    users = read_csv(USERS)
-    for user in users:
-        if user.get('email') == email:
-            return user
-    return None
 
-def find_user_by_id(user_id):
-    users = read_csv(USERS)
-    target_id = str(user_id) 
-    for user in users:
-        if user.get('user_id') == target_id:
-            return user
-    return None
 
-def get_next_user_id():
-    users = read_csv(USERS)
-
-    if not users:
-        return 1
-    
-    max_id = 0
-    for user in users:
-        user_id = int(user.get('user_id', 0))
-        if user_id > max_id:
-            max_id = user_id
-    
-    return max_id + 1
-
-def get_next_project_id():
-    projects = read_csv(PROJECTS)
-
-    if not projects:
-        return 1
-    
-    max_id = 0
-    for project in projects:
-        project_id = int(project.get('project_id', 0))
-        if project_id > max_id:
-            max_id = project_id
-    
-    return max_id + 1
-
-def update_user_data(user_id, new_data):
-    users = read_csv(USERS)
-    updated_users_list = []
-    target_id = str(user_id) 
-    for user in users:
-        if user["user_id"] == target_id:
-            user.update(new_data)
-        updated_users_list.append(user)
-    
-    overwrite_csv(USERS, USER_FIELDNAMES, updated_users_list)
-
-def update_project_data(project_id, new_data):
-    projects = read_csv(PROJECTS)
-    updated_projects_list = []
-    target_id = str(project_id)
- 
-    for project in projects:
-        if project.get('project_id') == target_id:
-            project.update(new_data)  # Atualiza o dicionário
-        updated_projects_list.append(project)
-     
-    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, updated_projects_list)
-
-def delete_project_data(project_id):
-    projects = read_csv(PROJECTS)
-    target_id = str(project_id) 
-     
-    remaining_projects = [
-        project for project in projects 
-        if project.get('project_id') != target_id
-    ]
-    
-    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining_projects)
-
-def find_project_by_id(project_id):
-    projects = read_csv(PROJECTS)
-    target_id = str(project_id) 
-    for project in projects:
-        if project.get('project_id') == target_id:
-            return project
-    return None
-
-def find_projects_by_user_id(user_id):
-    all_projects = read_csv(PROJECTS)
-
-    user = find_user_by_id(user_id)
-    
-    my_projects = []
-    target_user_id = str(user_id) 
- 
-    for project in all_projects:
-        project_user_id = project.get('user_id')
-        if project_user_id == target_user_id:
-            project.pop('user_id')
-            project['owner_user'] = user['name']
-            my_projects.append(project)
-             
-    return my_projects
-
-def delete_user_data(user_id):
-    users = read_csv(USERS)
-    target_id = str(user_id) 
-    users = [user for user in users if user['user_id'] != target_id]
-
-    overwrite_csv(USERS,USER_FIELDNAMES,users)
+# usuarios
 
 def save_user(user):
     save_csv(USERS, USER_FIELDNAMES, user)
 
+
+def find_user_by_email(email):
+    users = read_csv(USERS)
+    for user in users:
+        if user.get("email") == email:
+            return user
+    return None
+
+
+def find_user_by_id(user_id):
+    target_id = str(user_id)
+    users = read_csv(USERS)
+    for user in users:
+        if user.get("user_id") == target_id:
+            return user
+    return None
+
+
+def get_next_user_id():
+    users = read_csv(USERS)
+    if not users:
+        return 1
+    max_id = max(int(u.get("user_id", 0)) for u in users)
+    return max_id + 1
+
+
+def update_user_data(user_id, new_data):
+    target_id = str(user_id)
+    users = read_csv(USERS)
+    updated = []
+
+    for user in users:
+        if user.get("user_id") == target_id:
+            user.update(new_data)
+        updated.append(user)
+
+    overwrite_csv(USERS, USER_FIELDNAMES, updated)
+
+
+def delete_user_data(user_id):
+    target_user_id = str(user_id)
+    
+    all_projects = read_csv(PROJECTS)
+    for p in all_projects:
+        if str(p.get('user_id')) == target_user_id:
+            delete_project_data(p['project_id'])
+
+    users = read_csv(USERS)
+    remaining_users = [u for u in users if str(u.get("user_id")) != target_user_id]
+    overwrite_csv(USERS, USER_FIELDNAMES, remaining_users)
+
+
+# projetos
+
 def save_project(project):
     save_csv(PROJECTS, PROJECT_FIELDNAMES, project)
 
-def get_next_list_id():
-    lists = read_csv(LISTS)
-    if not lists:
+
+def get_next_project_id():
+    projects = read_csv(PROJECTS)
+    if not projects:
         return 1
-    max_id = 0
-    for list in lists:
-        lists_id = int(list.get('list_id', 0))
-        if lists_id > max_id:
-            max_id = lists_id
+    max_id = max(int(p.get("project_id", 0)) for p in projects)
     return max_id + 1
 
-def save_list(lista_data):
-    save_csv(LISTS, LIST_FIELDNAMES, lista_data)
 
-def find_lists_by_project_id(project_id):
-    all_lists = read_csv(LISTS)
-    project_lists = []
+def find_project_by_id(project_id):
     target_id = str(project_id)
-    
-    for list in all_lists:
-        if list.get('project_id') == target_id:
-            project_lists.append(list)
-            
-    return project_lists
-
-def find_list_by_id(list_id):
-    lists = read_csv(LISTS)
-    target_id = str(list_id)
-    for list in lists:
-        if list.get('list_id') == target_id:
-            return list
+    projects = read_csv(PROJECTS)
+    for project in projects:
+        if project.get("project_id") == target_id:
+            return project
     return None
 
-def delete_list_data(list_id):
-    lists = read_csv(LISTS)
+
+def find_projects_by_user_id(user_id):
+    target_user_id = str(user_id)
+    projects = read_csv(PROJECTS)
+    user = find_user_by_id(user_id)
+
+    my_projects = []
+    for project in projects:
+        if project.get("user_id") == target_user_id:
+            project.pop("user_id")
+            project["owner_user"] = user["name"]
+            my_projects.append(project)
+
+    return my_projects
+
+
+def update_project_data(project_id, new_data):
+    target_id = str(project_id)
+    projects = read_csv(PROJECTS)
+    updated = []
+
+    for project in projects:
+        if project.get("project_id") == target_id:
+            project.update(new_data)
+        updated.append(project)
+
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, updated)
+
+def delete_project_data(project_id):
+    target_proj_id = str(project_id)
+    all_lists = read_csv(LISTS)
+
+    lists_to_remove = [l for l in all_lists if str(l.get('project_id')) == target_proj_id]
+    
+    for lista in lists_to_remove:
+        delete_list_data(lista['list_id'])
+
+    projects = read_csv(PROJECTS)
+    remaining_projects = [p for p in projects if str(p.get("project_id")) != target_proj_id]
+    overwrite_csv(PROJECTS, PROJECT_FIELDNAMES, remaining_projects)
+
+
+# listas
+
+def get_next_list_id():
+    lists_data = read_csv(LISTS)
+    if not lists_data:
+        return 1
+    max_id = max(int(l.get("list_id", 0)) for l in lists_data)
+    return max_id + 1
+
+
+def save_list(lista):
+    save_csv(LISTS, LIST_FIELDNAMES, lista)
+
+
+def find_lists_by_project_id(project_id):
+    target_id = str(project_id)
+    lists_data = read_csv(LISTS)
+    return [l for l in lists_data if l.get("project_id") == target_id]
+
+
+def find_list_by_id(list_id):
     target_id = str(list_id)
-    
-    # Filtra a lista mantendo apenas as que NÃO são o alvo
-    remaining_lists = [l for l in lists if l.get('list_id') != target_id]
-    
-    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining_lists)
+    lists_data = read_csv(LISTS)
+    for lista in lists_data:
+        if lista.get("list_id") == target_id:
+            return lista
+    return None
+
 
 def update_list_data(list_id, new_data):
-    lists = read_csv(LISTS)
     target_id = str(list_id)
-    updated_lists = []
+    lists_data = read_csv(LISTS)
+    updated = []
 
-    for list in lists:
-        if list.get('list_id') == target_id:
-            list.update(new_data) # Atualiza os campos
-        updated_lists.append(list)
+    for lista in lists_data:
+        if lista.get("list_id") == target_id:
+            lista.update(new_data)
+        updated.append(lista)
+
+    overwrite_csv(LISTS, LIST_FIELDNAMES, updated)
+
+def delete_list_data(list_id):
+    target_list_id = str(list_id)
+    all_tasks = read_csv(TASKS)
     
-    overwrite_csv(LISTS, LIST_FIELDNAMES, updated_lists)
+    tasks_in_list = [t for t in all_tasks if str(t.get('list_id')) == target_list_id]
+    
+    for task in tasks_in_list:
+        delete_task_data(task['task_id'])
+
+    lists_data = read_csv(LISTS)
+    remaining_lists = [l for l in lists_data if str(l.get("list_id")) != target_list_id]
+    overwrite_csv(LISTS, LIST_FIELDNAMES, remaining_lists)
+
+
+# tarefas
+
+def get_next_task_id():
+    tasks = read_csv(TASKS)
+    if not tasks:
+        return 1
+    valid_ids = [int(t["task_id"]) for t in tasks if t.get("task_id") and t["task_id"].isdigit()]
+    max_id = max(valid_ids) if valid_ids else 0
+
+    return max_id + 1
+
+
+def save_task(task):
+    save_csv(TASKS, TASKS_FIELDNAMES, task)
+
+
+def find_tasks_by_list_id(list_id):
+    target_id = str(list_id)
+    tasks = read_csv(TASKS)
+
+    if not tasks:
+        return 'Nenhuma task encontrada'
+
+    return [t for t in tasks if t.get("list_id") == target_id]
+
+
+def find_task_by_id(task_id):
+    target_id = str(task_id)
+    tasks = read_csv(TASKS)
+    for task in tasks:
+        if task.get("task_id") == target_id:
+            return task
+    return None
+
+
+def update_task_data(task_id, new_data):
+    target_id = str(task_id)
+    tasks = read_csv(TASKS)
+    updated = []
+
+    for task in tasks:
+        if task.get("task_id") == target_id:
+            task.update(new_data)
+        updated.append(task)
+
+    overwrite_csv(TASKS, TASKS_FIELDNAMES, updated)
+
+
+def delete_task_data(task_id):
+    target_task_id = str(task_id)
+    all_comments = read_csv(COMMENTS)
+    
+    comments_to_remove = [c for c in all_comments if str(c.get('task_id')) == target_task_id]
+    
+    for comment in comments_to_remove:
+        delete_comment_data(comment['comment_id'])
+
+    all_tasks = read_csv(TASKS)
+    remaining_tasks = [t for t in all_tasks if str(t.get("task_id")) != target_task_id]
+    overwrite_csv(TASKS, TASKS_FIELDNAMES, remaining_tasks)
+
+
+# comentarios
+
+def find_comments_by_task_id(task_id):
+    comments = read_csv(COMMENTS)
+    return [c for c in comments if str(c["task_id"]) == str(task_id)]
+
+
+def get_next_comment_id():
+    comments = read_csv(COMMENTS)
+    if not comments:
+        return 1
+
+    valid_ids = [int(c["comment_id"]) for c in comments if c.get("comment_id") and c["comment_id"].isdigit()]
+    return max(valid_ids) + 1 if valid_ids else 1
+
+
+def save_comment(comment):
+    save_csv(COMMENTS, COMMENTS_FIELDNAMES, comment)
+
+
+def update_comment_data(comment_id, new_content):
+    comments = read_csv(COMMENTS)
+    updated = False
+
+    for c in comments:
+        if str(c["comment_id"]) == str(comment_id):
+            c["content"] = new_content
+            updated = True
+            break
+
+    if updated:
+        overwrite_csv(COMMENTS, COMMENTS_FIELDNAMES, comments)
+
+    return updated
+
+
+def delete_comment_data(comment_id):
+    comments = read_csv(COMMENTS)
+    new_comments = [c for c in comments if str(c["comment_id"]) != str(comment_id)]
+    overwrite_csv(COMMENTS, COMMENTS_FIELDNAMES, new_comments)

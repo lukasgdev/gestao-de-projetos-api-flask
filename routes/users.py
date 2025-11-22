@@ -8,10 +8,39 @@ user_route = Blueprint('users', __name__)
 
 @user_route.route('/register', methods=['POST'])
 def create_user():
+    """
+    Registra um novo usuário.
+    ---
+    tags:
+      - Users
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              example: usuario@email.com
+            senha:
+              type: string
+              example: "123456"
+            nome:
+              type: string
+              example: João Silva
+    responses:
+      201:
+        description: Usuário cadastrado com sucesso
+      400:
+        description: Dados inválidos ou email já cadastrado
+    """
     data = request.json
     email = data.get('email', '')
-    password = data.get('senha', '')
-    name = data.get('nome', '')
+    password = data.get('password', '')
+    name = data.get('name', '')
 
     if not email or not name or not password:
         return jsonify({"msg": 'Email, senha e nome são obrigatorios'}), 400
@@ -27,15 +56,53 @@ def create_user():
         "name": name,
         "password_hash": password_hash,
         "email": email,
-        "created_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
     save_user(new_user)
 
-    return jsonify(msg="Usuário cadastrado com sucesso!"), 201
+    return jsonify({
+        'msg': 'Usuário cadastrado com sucesso',
+        'user': {
+            "user_id": new_user["user_id"],
+            "name": new_user["name"],
+            "email": new_user["email"],
+            "created_at": new_user["created_at"]
+        }
+    }), 201
+
 
 @user_route.route('/login', methods=['POST'])
 def login():
+    """
+    Realiza login e retorna tokens JWT.
+    ---
+    tags:
+      - Users
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            senha:
+              type: string
+          example:
+            email: usuario@email.com
+            senha: "123456"
+    responses:
+      200:
+        description: Login bem-sucedido, tokens retornados
+      400:
+        description: Dados incompletos
+      401:
+        description: Credenciais inválidas
+    """
     data = request.json
     email = data.get('email', '')
     password = data.get('senha', '')
@@ -64,6 +131,19 @@ def login():
 @user_route.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh_token():
+    """
+    Gera um novo access token utilizando o refresh token.
+    ---
+    tags:
+      - Users
+    security:
+      - RefreshToken: []
+    responses:
+      200:
+        description: Novo access token gerado
+      404:
+        description: Usuário não encontrado
+    """
     current_user_id = get_jwt_identity()
     
     user = find_user_by_id(current_user_id)
@@ -75,26 +155,68 @@ def refresh_token():
 
     return jsonify(access_token=new_acess_token), 200
 
+
 @user_route.route('/user')
 @jwt_required()
 def user_info():
+    """
+    Retorna as informações do usuário autenticado.
+    ---
+    tags:
+      - Users
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Informações do usuário
+      404:
+        description: Usuário não encontrado
+    """
     current_user_id = get_jwt_identity()
 
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"error": "Nenhum usuário logado"}), 404
+        return jsonify({"msg": "Nenhum usuario logado"}), 404
     
     return jsonify({
         "id": user.get("user_id"),
         "nome": user.get("name"),
         "email": user.get("email"),
-        "criado_em": user.get('created_on')
+        "criado_em": user.get('created_at')
     }), 200
+
 
 @user_route.route('/user', methods=['PUT'])
 @jwt_required()
 def update_user():
+    """
+    Atualiza os dados do usuário autenticado.
+    ---
+    tags:
+      - Users
+    security:
+      - Bearer: []
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            nome:
+              type: string
+            email:
+              type: string
+            senha:
+              type: string
+    responses:
+      200:
+        description: Dados atualizados com sucesso
+      400:
+        description: Nenhum dado enviado
+    """
     current_user_id = get_jwt_identity()
     data = request.json
 
@@ -119,9 +241,40 @@ def update_user():
 
     return jsonify(error='Informe o que deseja atualizar corretamente'), 400
 
+
 @user_route.route('/user', methods=['DELETE'])
 @jwt_required()
 def delete_user():
+    """
+    Deleta o usuário autenticado.
+    ---
+    tags:
+      - Users
+    security:
+      - Bearer: []
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            senha:
+              type: string
+              example: "123456"
+          required:
+            - senha
+    responses:
+      200:
+        description: Usuário deletado
+      400:
+        description: Senha não informada
+      401:
+        description: Senha inválida
+      404:
+        description: Usuário não encontrado
+    """
     current_user_id = get_jwt_identity()
 
     password = request.json.get('senha', '')
@@ -139,4 +292,4 @@ def delete_user():
         delete_user_data(current_user_id)
         return jsonify(success='Usuario deletado'), 200
 
-    return jsonify(error='Senha inválida'), 401
+    return jsonify(msg='Senha inválida'), 401

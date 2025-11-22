@@ -1,2 +1,2 @@
-user_id,name,email,password_hash,created_on
-1,al,al@gmail.com,scrypt:32768:8:1$juya4PMm1D8NmYys$e7cffc377cce95202fb5d0d733afc1a6fbc835676b6451e2e6cae274a590289a70401b988db11ec9e0eae5f29ec6348ead4080b2ba357c64b3ce4412dbce2352,2025-11-21 23:22:56
+user_id,name,email,password_hash,created_at
+1,Lukas,al@gmail.com,scrypt:32768:8:1$zxUXICAXCAmJwSPP$b84bfe8d5e74959ac6f780f052a45d9a33eeb575134db247a732bc72c51fb67180f5f5485cb46443a0693592fb5018c2c950467038209de71db9e2a621d2f719,2025-11-22 00:57:23
