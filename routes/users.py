@@ -19,16 +19,17 @@ def create_user():
       - in: body
         name: body
         required: true
+        description: Os campos email, password e name são obrigatórios.
         schema:
           type: object
           properties:
             email:
               type: string
               example: usuario@email.com
-            senha:
+            password:
               type: string
-              example: "123456"
-            nome:
+              example: "1234"
+            name:
               type: string
               example: João Silva
     responses:
@@ -85,16 +86,16 @@ def login():
       - in: body
         name: body
         required: true
+        description: Os campos email e password são obrigatórios. <br>Copie o accesso token gerado após o login e cole no campo "Authorize" no canto superior direito da tela para acessar as rotas protegidas. (Bearer {token})
         schema:
           type: object
           properties:
             email:
               type: string
-            senha:
+              example: usuario@email.com
+            password:
               type: string
-          example:
-            email: usuario@email.com
-            senha: "123456"
+              example: "1234"
     responses:
       200:
         description: Login bem-sucedido, tokens retornados
@@ -105,7 +106,7 @@ def login():
     """
     data = request.json
     email = data.get('email', '')
-    password = data.get('senha', '')
+    password = data.get('password', '')
 
     if not email or not password:
         return jsonify({"msg": 'Email e senha são obrigatorios'}), 400
@@ -202,14 +203,15 @@ def update_user():
     parameters:
       - in: body
         name: body
+        description: Envie apenas os campos que deseja alterar (delete as linhas dos outros no JSON)
         schema:
           type: object
           properties:
-            nome:
+            name:
               type: string
             email:
               type: string
-            senha:
+            password:
               type: string
     responses:
       200:
@@ -220,19 +222,15 @@ def update_user():
     current_user_id = get_jwt_identity()
     data = request.json
 
-    new_name = data.get('nome', '')
+    new_name = data.get('name', '')
     new_email = data.get('email', '')
-    new_password = data.get('senha', '')
+    new_password = data.get('password', '')
 
     if new_name or new_email or new_password:
         if new_password:
             new_password_hash = generate_password_hash(new_password)
-            data.pop('senha')
+            data.pop('password')
             data['password_hash'] = new_password_hash
-        
-        if new_name:
-            data.pop('nome')
-            data['name'] = new_name
 
         update_user_data(current_user_id, data)
 
@@ -257,14 +255,14 @@ def delete_user():
     parameters:
       - in: body
         name: body
+        required: true
+        description: Informe a senha do usuário para confirmação
         schema:
           type: object
           properties:
-            senha:
+            password:
               type: string
-              example: "123456"
-          required:
-            - senha
+              example: "1234"
     responses:
       200:
         description: Usuário deletado
@@ -277,7 +275,7 @@ def delete_user():
     """
     current_user_id = get_jwt_identity()
 
-    password = request.json.get('senha', '')
+    password = request.json.get('password', '')
 
     if not password:
         return jsonify(error='informe a senha de usuario'), 400
