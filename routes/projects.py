@@ -96,17 +96,15 @@ def updated_project(project_id):
     
     # Verifica se o nome do projeto foi fornecido
     data = request.json
-    new_title = data.get("project_title")
-    
-    if not new_title:
-        return jsonify(error="Nome do projeto é obrigatório"), 400
-    
+    old_title = project.get("project_title")
+    new_title = data.get("project_title") or old_title
+    new_description = project.get("project_description","")
+
     # Verifica se o usuário é o dono do projeto
     owner_user_id = project.get("user_id")
     if owner_user_id != current_user_id:
         return jsonify(error="Você não tem permissão para editar este projeto"), 403
     
-    new_description = project.get("project_description","")
     new_data_to_update = {
         "project_title": new_title,
         "project_description": data.get("project_description",new_description),

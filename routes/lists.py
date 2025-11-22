@@ -54,17 +54,27 @@ def create_list_for_project(project_id):
 @list_route.route('/<project_id>/lists')
 @jwt_required()
 def get_project_lists(project_id):
-
+    
+    current_user_id = get_jwt_identity()
     project = find_project_by_id(project_id)
+    my_lists = find_lists_by_project_id(project_id)
 
+    # Verifica se o projeto existe
     if not project:
         return jsonify(error="Projeto não encontrado"), 404
     
-    #Verifica se o projeto existe
-    my_lists = find_lists_by_project_id(project_id)
+    # Verifica se o usuário existe
+    if not current_user_id:
+        return jsonify(error="Usuário não encontrado"), 404
+    
+    # Verifica se o usuário é o dono do projeto
+    if current_user_id  != project.get('user_id'):
+        return jsonify(error="Você não tem permissão para ver as listas deste projeto"), 403
 
+    # Verifica se o projeto possui listas
     if not my_lists:
         return jsonify(error="Nenhuma lista encontrada para este projeto."), 200
+    
     response = {
         "project_id": project_id,
         "lists": my_lists,
@@ -74,6 +84,39 @@ def get_project_lists(project_id):
         "success":"Busca Realizada com sucesso",
         project.get("project_title"):response
         }), 200
+
+@list_route.route('/<project_id>/lists/<list_id>')
+@jwt_required()
+
+def get_specific_list(project_id, list_id):
+
+    current_user_id = get_jwt_identity()
+    my_lists = find_list_by_id(list_id)
+    project = find_project_by_id(project_id)
+
+    if not current_user_id:
+        return jsonify(error="Usuário não encontrado"), 404
+    
+    #Verifica se o projeto existe
+    if not project:
+        return jsonify(error="Projeto não encontrado"), 404
+    
+    #Verifica se a lista existe
+    if not my_lists:
+        return jsonify(error="Lista não encontrada"), 404
+
+    # Verifica se essa lista pertence mesmo ao projeto informado na URL
+    if my_lists.get('project_id') != str(project_id):
+        return jsonify(error="Esta lista não pertence ao projeto informado"), 400
+    
+    # Verifica se o usuário é o dono do projeto
+    if project.get('user_id') != current_user_id:
+        return jsonify(error="Você não tem permissão para visualizar esta lista"), 403
+
+    return jsonify({
+        "success":"Busca Realizada com sucesso",
+        "data":my_lists
+                    }), 200
 
 # DELETAR UMA LISTA DE UM PROJETO
 @list_route.route('/<project_id>/lists/<list_id>', methods=['DELETE'])
