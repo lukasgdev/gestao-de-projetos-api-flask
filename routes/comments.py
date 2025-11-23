@@ -62,26 +62,26 @@ def create_comment(project_id, list_id, task_id):
     data = request.get_json()
 
     if not data or "content" not in data:
-        return jsonify({"msg": "Nenhum conteúdo enviado"}), 400
+      return jsonify({"error": "Nenhum conteúdo enviado"}), 400
 
     # verifica projeto
     project = find_project_by_id(project_id)
     if not project:
-        return jsonify({"msg": "Projeto não encontrado"}), 404
+      return jsonify({"error": "Projeto não encontrado"}), 404
 
     # verifica permissão
     if str(project["user_id"]) != str(current_user_id):
-        return jsonify({"msg": "voce nao tem permissao para acessar esse projeto"}), 403
+      return jsonify({"error": "voce nao tem permissao para acessar esse projeto"}), 403
 
     # verifica lista
     lista = find_list_by_id(list_id)
     if not lista or str(lista["project_id"]) != str(project_id):
-        return jsonify({"msg": "Lista não encontrada no projeto"}), 404
+      return jsonify({"error": "Lista não encontrada no projeto"}), 404
 
     # verifica task
     task = find_task_by_id(task_id)
     if not task or str(task["list_id"]) != str(list_id):
-        return jsonify({"msg": "Task não encontrada na lista"}), 404
+      return jsonify({"error": "Task não encontrada na lista"}), 404
 
     new_comment_id = get_next_comment_id()
 
@@ -93,7 +93,7 @@ def create_comment(project_id, list_id, task_id):
     }
 
     save_comment(new_comment)
-    return jsonify({"msg": "Comentário criado com sucesso!", "comment": new_comment}), 201
+    return jsonify({"message": "Comentário criado com sucesso!", "comment": new_comment}), 201
 
 
 
@@ -135,25 +135,42 @@ def list_comments(project_id, list_id, task_id):
 
     # verifica projeto
     project = find_project_by_id(project_id)
-    if not project or str(project["user_id"]) != str(current_user_id):
-        return jsonify({"error": "Projeto não encontrado ou não permitido"}), 403
+    if not project:
+      return jsonify({"error": "Projeto não encontrado"}), 404
+    
+    if str(project["user_id"]) != str(current_user_id):
+      return jsonify({"error": "Você não tem permissão para ver os comentários deste projeto"}), 403
 
     # verifica lista
-    lista = find_list_by_id(list_id)
-    if not lista or str(lista["project_id"]) != str(project_id):
-        return jsonify({"error": "Lista não encontrada"}), 404
+    list = find_list_by_id(list_id)
+    if not list or str(list["project_id"]) != str(project_id):
+      return jsonify({"error": "Lista não encontrada"}), 404
 
     # verifica task
     task = find_task_by_id(task_id)
     if not task or str(task["list_id"]) != str(list_id):
-        return jsonify({"error": "Task não encontrada"}), 404
+      return jsonify({"error": "Task não encontrada"}), 404
 
     comments = find_comments_by_task_id(task_id)
 
     if not comments:
-        return jsonify(msg="Nenhum comentário encontrado para esta task."), 200
+      return jsonify({
+        "message": "Nenhum comentário encontrado para esta task.",
+      }), 200
 
-    return jsonify({"comments": comments}), 200
+    response = {
+        "task_info": {
+            "task_id": task_id,
+            "title": task.get('title'),
+            "description": task.get('description'),
+        },
+        "comments": comments or [],
+    }
+
+    return jsonify({
+      "message": "Comentários recuperados com sucesso",
+      "data": response
+    }), 200
 
 
 
@@ -206,28 +223,30 @@ def update_comment(project_id, list_id, task_id, comment_id):
     data = request.get_json()
 
     if not data or "content" not in data:
-        return jsonify({"msg": "Nenhum conteúdo enviado"}), 400
+      return jsonify({"error": "Nenhum conteúdo enviado"}), 400
 
     # verifica projeto
     project = find_project_by_id(project_id)
-    if not project or str(project["user_id"]) != str(current_user_id):
-        return jsonify({"msg": "Sem permissão"}), 403
+    if not project:
+      return jsonify({"error": "Projeto não encontrado"}), 404
+    if str(project["user_id"]) != str(current_user_id):
+      return jsonify({"error": "Sem permissão"}), 403
 
     # verifica lista
     lista = find_list_by_id(list_id)
     if not lista or str(lista["project_id"]) != str(project_id):
-        return jsonify({"msg": "Lista inválida"}), 400
+      return jsonify({"error": "Lista inválida"}), 400
 
     # verifica task
     task = find_task_by_id(task_id)
     if not task or str(task["list_id"]) != str(list_id):
-        return jsonify({"msg": "Task inválida"}), 400
+      return jsonify({"error": "Task inválida"}), 400
 
     updated = update_comment_data(comment_id, data["content"])
     if not updated:
-        return jsonify({"msg": "Comentário não encontrado"}), 404
+      return jsonify({"error": "Comentário não encontrado"}), 404
 
-    return jsonify({"msg": "Comentário atualizado com sucesso!"}), 200
+    return jsonify({"message": "Comentário atualizado com sucesso!"}), 200
 
 
 
@@ -271,19 +290,21 @@ def delete_comment(project_id, list_id, task_id, comment_id):
 
     # verifica projeto
     project = find_project_by_id(project_id)
-    if not project or str(project["user_id"]) != str(current_user_id):
-        return jsonify({"msg": "Sem permissão"}), 403
+    if not project:
+      return jsonify({"error": "Projeto não encontrado"}), 404
+    if str(project["user_id"]) != str(current_user_id):
+      return jsonify({"error": "Sem permissão"}), 403
 
     # verifica lista
     lista = find_list_by_id(list_id)
     if not lista or str(lista["project_id"]) != str(project_id):
-        return jsonify({"msg": "Lista inválida"}), 400
+      return jsonify({"error": "Lista inválida"}), 400
 
     # verifica task
     task = find_task_by_id(task_id)
     if not task or str(task["list_id"]) != str(list_id):
-        return jsonify({"msg": "Task inválida"}), 400
+      return jsonify({"error": "Task inválida"}), 400
 
     delete_comment_data(comment_id)
 
-    return jsonify({"msg": "Comentário deletado com sucesso!"}), 200
+    return jsonify({"message": "Comentário deletado com sucesso!"}), 200

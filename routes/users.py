@@ -44,10 +44,10 @@ def create_user():
     name = data.get('name', '')
 
     if not email or not name or not password:
-        return jsonify({"msg": 'Email, senha e nome são obrigatorios'}), 400
+      return jsonify({"error": 'Email, senha e nome são obrigatorios'}), 400
     
     if find_user_by_email(email):
-        return jsonify({"msg": 'Email ja cadastrado'}), 400
+      return jsonify({"error": 'Email ja cadastrado'}), 400
     
     password_hash = generate_password_hash(password)
     new_id = get_next_user_id()
@@ -62,16 +62,9 @@ def create_user():
 
     save_user(new_user)
 
-    return jsonify({
-        'msg': 'Usuário cadastrado com sucesso',
-        'user': {
-            "user_id": new_user["user_id"],
-            "name": new_user["name"],
-            "email": new_user["email"],
-            "created_at": new_user["created_at"]
-        }
-    }), 201
+    new_user.pop('password_hash')
 
+    return jsonify({"message": 'Usuário cadastrado com sucesso', "data": new_user}), 201
 
 @user_route.route('/login', methods=['POST'])
 def login():
@@ -109,12 +102,12 @@ def login():
     password = data.get('password', '')
 
     if not email or not password:
-        return jsonify({"msg": 'Email e senha são obrigatorios'}), 400
+      return jsonify({"error": 'Email e senha são obrigatorios'}), 400
     
     user = find_user_by_email(email)
 
     if not user:
-        return jsonify({"msg": 'Email ou senha inválidos'}), 401
+      return jsonify({"error": 'Email ou senha inválidos'}), 401
     
     password_hash = user.get('password_hash')
     if check_password_hash(password_hash, password):
@@ -123,10 +116,10 @@ def login():
         access_token = create_access_token(identity=user_id)
         refresh_token = create_refresh_token(identity=user_id)
 
-        return jsonify(access_token=access_token, refresh_token=refresh_token), 200
+        return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
     
     else:
-        return jsonify({"msg": "Email ou senha inválidos"}), 401
+      return jsonify({"error": "Email ou senha inválidos"}), 401
     
 
 @user_route.route('/refresh', methods=['POST'])
@@ -150,11 +143,11 @@ def refresh_token():
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"msg": "Usuário não encontrado"}), 404
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
     
     new_acess_token= create_access_token(identity=current_user_id)
 
-    return jsonify(access_token=new_acess_token), 200
+    return jsonify({"access_token": new_acess_token}), 200
 
 
 @user_route.route('/user')
@@ -178,14 +171,11 @@ def user_info():
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify({"msg": "Nenhum usuario logado"}), 404
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
     
-    return jsonify({
-        "id": user.get("user_id"),
-        "nome": user.get("name"),
-        "email": user.get("email"),
-        "criado_em": user.get('created_at')
-    }), 200
+    user.pop('password_hash')
+
+    return jsonify({"message": "Perfil recuperado com sucesso" ,"data": user}), 200
 
 
 @user_route.route('/user', methods=['PUT'])
@@ -220,6 +210,12 @@ def update_user():
         description: Nenhum dado enviado
     """
     current_user_id = get_jwt_identity()
+
+    user = find_user_by_id(current_user_id)
+
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
+
     data = request.json
 
     new_name = data.get('name', '')
@@ -232,12 +228,13 @@ def update_user():
             data.pop('password')
             data['password_hash'] = new_password_hash
 
-        update_user_data(current_user_id, data)
+        updated_data = update_user_data(current_user_id, data)
+        updated_data.pop('password_hash')
 
-        return jsonify(success='Cadastro atualizado com sucesso'), 200
+        return jsonify({"message": 'Cadastro atualizado com sucesso!', "data": updated_data}), 200
 
 
-    return jsonify(error='Informe o que deseja atualizar corretamente'), 400
+    return jsonify({"error": 'Informe o que deseja atualizar corretamente'}), 400
 
 
 @user_route.route('/user', methods=['DELETE'])
@@ -275,19 +272,19 @@ def delete_user():
     """
     current_user_id = get_jwt_identity()
 
-    password = request.json.get('password', '')
-
-    if not password:
-        return jsonify(error='informe a senha de usuario'), 400
-    
     user = find_user_by_id(current_user_id)
 
     if not user:
-        return jsonify(error='usuário não encontrado'), 404
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente."}), 401
+
+    password = request.json.get('password', '')
+
+    if not password:
+      return jsonify({"error": 'informe a senha de usuario'}), 400
     
     password_hash = user.get('password_hash')
     if check_password_hash(password_hash, password):
         delete_user_data(current_user_id)
-        return jsonify(success='Usuario deletado'), 200
+        return jsonify({"message": 'Usuario deletado!'}), 200
 
-    return jsonify(msg='Senha inválida'), 401
+    return jsonify({"error": 'Senha inválida.'}), 401

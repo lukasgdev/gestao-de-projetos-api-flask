@@ -26,14 +26,16 @@ load_dotenv()
 @app.route("/")
 def api():
     """
-    API ESTA FUNCIONANDO
+    Rota raiz para verificar se a API está funcionando.
     ---
+    tags:
+        - Root
     responses:
         200:
             description: API funcionando corretamente
     """
     
-    return jsonify(msg="Api funcionando.")
+    return jsonify({"message": "Api funcionando."})
 
 # Registrando blueprints
 app.register_blueprint(user_route)
@@ -45,23 +47,17 @@ app.register_blueprint(comments_route, url_prefix='/user/projects/<project_id>/l
 # Tratamento de token expirado
 @jwt.expired_token_loader
 def my_expired_token_callback(jwt_header, jwt_payload):
-    return jsonify({
-        "msg": "Sua sessão expirou. Por favor, faça login novamente.",
-    }), 401
+    return jsonify({"error": "Sua sessão expirou. Por favor, faça login novamente."}), 401
 
 # Tratamento de token inválido
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
-    return jsonify({
-        "msg": "Sessão inválida. Por favor, faça login para continuar.",
-    }), 422
+    return jsonify({"error": "Sessão inválida. Por favor, faça login para continuar."}), 422
 
 # Tratamento de token ausente
 @jwt.unauthorized_loader
 def my_missing_token_callback(error):
-    return jsonify({
-        "msg": "Nenhum token encontrado. Por favor, faça login para continuar.",
-    }), 401
+    return jsonify({"error": "Nenhum token encontrado. Por favor, faça login para continuar."}), 401
 
 # Configuração do Swagger
 swagger_template = {

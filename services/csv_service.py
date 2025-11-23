@@ -81,20 +81,23 @@ def get_next_user_id():
     if not users:
         return 1
     max_id = max(int(u.get("user_id", 0)) for u in users)
-    return max_id + 1
+    return str(max_id + 1)
 
 
 def update_user_data(user_id, new_data):
     target_id = str(user_id)
     users = read_csv(USERS)
     updated = []
-
+    updated_user = None
     for user in users:
         if user.get("user_id") == target_id:
             user.update(new_data)
+            updated_user = user
         updated.append(user)
 
     overwrite_csv(USERS, USER_FIELDNAMES, updated)
+
+    return updated_user
 
 
 def delete_user_data(user_id):
@@ -121,7 +124,7 @@ def get_next_project_id():
     if not projects:
         return 1
     max_id = max(int(p.get("project_id", 0)) for p in projects)
-    return max_id + 1
+    return str(max_id + 1)
 
 
 def find_project_by_id(project_id):
@@ -181,8 +184,7 @@ def get_next_list_id():
     if not lists_data:
         return 1
     max_id = max(int(l.get("list_id", 0)) for l in lists_data)
-    return max_id + 1
-
+    return str(max_id + 1)
 
 def save_list(lista):
     save_csv(LISTS, LIST_FIELDNAMES, lista)
@@ -235,10 +237,9 @@ def get_next_task_id():
     tasks = read_csv(TASKS)
     if not tasks:
         return 1
-    valid_ids = [int(t["task_id"]) for t in tasks if t.get("task_id") and t["task_id"].isdigit()]
-    max_id = max(valid_ids) if valid_ids else 0
+    max_id = max(int(t.get("task_id",0)) for t in tasks)
 
-    return max_id + 1
+    return str(max_id + 1)
 
 
 def save_task(task):
@@ -248,10 +249,6 @@ def save_task(task):
 def find_tasks_by_list_id(list_id):
     target_id = str(list_id)
     tasks = read_csv(TASKS)
-
-    if not tasks:
-        return 'Nenhuma task encontrada'
-
     return [t for t in tasks if t.get("list_id") == target_id]
 
 
@@ -302,9 +299,8 @@ def get_next_comment_id():
     comments = read_csv(COMMENTS)
     if not comments:
         return 1
-
-    valid_ids = [int(c["comment_id"]) for c in comments if c.get("comment_id") and c["comment_id"].isdigit()]
-    return max(valid_ids) + 1 if valid_ids else 1
+    max_id = max(int(c.get("comment_id", 0)) for c in comments)
+    return str(max_id + 1)
 
 
 def save_comment(comment):
