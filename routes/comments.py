@@ -9,7 +9,9 @@ from services.csv_service import (
     get_next_comment_id,
     save_comment,
     update_comment_data,
-    delete_comment_data
+    delete_comment_data,
+    find_comment_by_id,
+    find_user_by_id
 )
 
 comments_route = Blueprint("comments", __name__)
@@ -172,6 +174,100 @@ def list_comments(project_id, list_id, task_id):
       "data": response
     }), 200
 
+@comments_route.route('/<comment_id>', methods=["GET"])
+@jwt_required()
+def get_specific_comment(project_id, list_id, task_id, comment_id):
+    """
+    Obter um comentário específico de uma task.
+    ---
+    tags:
+      - Comments
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
+      - in: path
+        name: comment_id
+        required: true
+        type: string
+    responses:
+      200:
+        description: Comentário retornado
+      400:
+        description: Alguma entidade não pertence ao nível correto
+      403:
+        description: Sem permissão
+      404:
+        description: Projeto, lista, task ou comentário não encontrado
+    """
+
+    current_user_id = get_jwt_identity()
+    user = find_user_by_id(current_user_id)
+
+    # Verifica usuário
+    if not user:
+        return jsonify({"error": "Usuário não encontrado. Por favor, faça login novamente."}), 401
+
+    # Verifica projeto
+    project = find_project_by_id(project_id)
+    if not project:
+        return jsonify({"error": "Projeto não encontrado"}), 404
+
+    # Verifica dono do projeto
+    if str(project["user_id"]) != str(current_user_id):
+        return jsonify({"error": "Você não tem permissão para visualizar este projeto"}), 403
+
+    # Verifica lista
+    lista = find_list_by_id(list_id)
+    if not lista:
+        return jsonify({"error": "Lista não encontrada"}), 404
+
+    if lista.get("project_id") != str(project_id):
+        return jsonify({"error": "Esta lista não pertence ao projeto informado"}), 400
+
+    # Verifica task
+    task = find_task_by_id(task_id)
+    if not task:
+        return jsonify({"error": "Task não encontrada"}), 404
+
+    if task.get("list_id") != str(list_id):
+        return jsonify({"error": "Esta task não pertence à lista informada"}), 400
+
+    # Verifica comment
+    comment = find_comment_by_id(comment_id)
+    if not comment:
+        return jsonify({"error": "Comentário não encontrado"}), 404
+
+    if comment.get("task_id") != str(task_id):
+        return jsonify({"error": "Este comentário não pertence à task informada"}), 400
+
+    # Resposta final
+    response = {
+        "project_info": {
+            "project_id": project_id,
+            "project_title": project.get("project_title"),
+            "project_description": project.get("project_description"),
+        },
+        "list_info": lista,
+        "task_info": task,
+        "comment": comment,
+    }
+
+    return jsonify({
+        "message": "Comentário recuperado com sucesso",
+        "data": response
+    }), 200
 
 
 # ============================================================

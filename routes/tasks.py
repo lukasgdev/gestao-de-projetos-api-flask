@@ -11,6 +11,7 @@ from services.csv_service import (
     find_tasks_by_list_id,
     find_project_by_id,
     find_list_by_id,
+    find_user_by_id
 )
 
 
@@ -150,6 +151,92 @@ def list_tasks(project_id, list_id):
     return jsonify({
       "message": "Tasks recuperadas com sucesso",
       "data": response
+    }), 200
+
+@tasks_route.route('/<task_id>', methods=["GET"])
+@jwt_required()
+def get_specific_task(project_id, list_id, task_id):
+    """
+    Obter uma task específica de uma lista
+    ---
+    tags:
+      - Tasks
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+      - in: path
+        name: task_id
+        required: true
+        type: string
+    responses:
+      200:
+        description: Task retornada
+      400:
+        description: Task não pertence à lista
+      403:
+        description: Sem permissão
+      404:
+        description: Task, lista ou projeto não encontrado
+    """
+
+    current_user_id = get_jwt_identity()
+
+    # Verifica usuário
+    user = find_user_by_id(current_user_id)
+    if not user:
+        return jsonify({"error": "Usuário não encontrado. Por favor, efetue o login novamente"}), 401
+
+    # Verifica projeto
+    project = find_project_by_id(project_id)
+    if not project:
+        return jsonify({"error": "Projeto não encontrado"}), 404
+
+    # Verifica lista
+    lista = find_list_by_id(list_id)
+    if not lista:
+        return jsonify({"error": "Lista não encontrada"}), 404
+
+    # Verifica task
+    task = find_task_by_id(task_id)
+    if not task:
+        return jsonify({"error": "Task não encontrada"}), 404
+
+    # Verifica se a lista pertence ao projeto
+    if lista.get('project_id') != str(project_id):
+        return jsonify({"error": "Esta lista não pertence ao projeto informado"}), 400
+
+    # Verifica se a task pertence à lista
+    if task.get('list_id') != str(list_id):
+        return jsonify({"error": "Esta task não pertence à lista informada"}), 400
+
+    # Verifica se o usuário é o dono do projeto
+    if project.get('user_id') != current_user_id:
+        return jsonify({"error": "Você não tem permissão para visualizar esta task"}), 403
+
+    response = {
+        "project_info": {
+            "project_id": project_id,
+            "project_title": project.get('project_title'),
+            "project_description": project.get('project_description'),
+        },
+        "list_info": {
+            "list_id": list_id,
+            "list_name": lista.get('list_name'),
+        },
+        "task": task,
+    }
+
+    return jsonify({
+        "message": "Task recuperada com sucesso",
+        "data": response
     }), 200
 
 
