@@ -294,6 +294,12 @@ def find_comments_by_task_id(task_id):
     comments = read_csv(COMMENTS)
     return [c for c in comments if str(c["task_id"]) == str(task_id)]
 
+def find_comment_by_id(comment_id):
+    comments = read_csv(COMMENTS)
+    for c in comments:
+        if str(c["comment_id"]) == str(comment_id):
+            return c
+    return None
 
 def get_next_comment_id():
     comments = read_csv(COMMENTS)
@@ -327,3 +333,4 @@ def delete_comment_data(comment_id):
     comments = read_csv(COMMENTS)
     new_comments = [c for c in comments if str(c["comment_id"]) != str(comment_id)]
     overwrite_csv(COMMENTS, COMMENTS_FIELDNAMES, new_comments)
+
