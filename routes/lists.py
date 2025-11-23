@@ -241,7 +241,7 @@ def delete_project_list(project_id, list_id):
     }
 
     return jsonify({
-      "success":"Lista deletada com sucesso",
+      "message":"Lista deletada com sucesso",
       "data":response
     }), 200
 
