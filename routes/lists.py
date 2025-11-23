@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.csv_service import (
     save_list, get_next_list_id, find_project_by_id, 
-    find_lists_by_project_id, find_list_by_id, delete_list_data, update_list_data
+    find_lists_by_project_id, find_list_by_id, delete_list_data, update_list_data, find_user_by_id
 )
 
 list_route = Blueprint('lists', __name__)
@@ -46,24 +46,21 @@ def create_list_for_project(project_id):
     """
     data = request.json
     list_name = data.get('list_name')
-    
-    if not list_name:
-      return jsonify({"error": "O nome da lista é obrigatório"}), 400
+    current_user_id = get_jwt_identity()
+    user = find_user_by_id(current_user_id)
 
+    # Verifica se o usuário existe
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
+    
     #Verifica se o projeto existe
     project = find_project_by_id(project_id)
-    
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     
     # Verifica se o nome da lista foi fornecido
     if not list_name:
       return jsonify({"error": "O nome da lista é obrigatório"}), 400
-
-    # Verifica se o usuário é o dono do projeto
-    current_user_id = get_jwt_identity()
-    if project.get('user_id') != current_user_id:
-      return jsonify({"error": "Você não tem permissão para adicionar listas a este projeto"}), 403
 
     #Cria a lista
     new_list = {
@@ -104,18 +101,19 @@ def get_project_lists(project_id):
       404:
         description: Projeto não encontrado
     """
-    
-    current_user_id = get_jwt_identity()
+
     project = find_project_by_id(project_id)
     my_lists = find_lists_by_project_id(project_id)
+    current_user_id = get_jwt_identity()
+    user = find_user_by_id(current_user_id)
+    
+    # Verifica se o usuário existe
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
 
     # Verifica se o projeto existe
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
-    
-    # Verifica se o usuário existe
-    if not current_user_id:
-      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente."}), 401
     
     # Verifica se o usuário é o dono do projeto
     if current_user_id  != project.get('user_id'):
@@ -142,13 +140,41 @@ def get_project_lists(project_id):
 @list_route.route('/<list_id>')
 @jwt_required()
 def get_specific_list(project_id, list_id):
+    """
+    Obter uma lista específica de um projeto
+    ---
+    tags:
+      - Lists
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+      - in: path
+        name: list_id
+        required: true
+        type: string
+    responses:
+      200:
+        description: Lista retornada
+      400:
+        description: Lista não pertence ao projeto
+      403:
+        description: Sem permissão
+      404:
+        description: Lista ou projeto não encontrado
+    """
 
-    current_user_id = get_jwt_identity()
     specific_list = find_list_by_id(list_id)
     project = find_project_by_id(project_id)
-
-    if not current_user_id:
-      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente."}), 401
+    current_user_id = get_jwt_identity()
+    user = find_user_by_id(current_user_id)
+    
+    # Verifica se o usuário existe
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
     
     #Verifica se o projeto existe
     if not project:
@@ -212,6 +238,11 @@ def delete_project_list(project_id, list_id):
         description: Lista ou projeto não encontrado
     """
     current_user_id = get_jwt_identity()
+    user = find_user_by_id(current_user_id)
+    
+    # Verifica se o usuário existe
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
 
     # Verifica se a lista existe
     lista = find_list_by_id(list_id)
@@ -281,11 +312,16 @@ def update_list(project_id, list_id):
       404:
         description: Lista ou projeto não encontrado
     """
-    current_user_id = get_jwt_identity()
-    
     # Pega o novo nome
     data = request.json
     new_name = data.get('list_name')
+
+    current_user_id = get_jwt_identity()
+    user = find_user_by_id(current_user_id)
+    
+    # Verifica se o usuário existe
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
 
     # verifica o Projeto 
     project = find_project_by_id(project_id)

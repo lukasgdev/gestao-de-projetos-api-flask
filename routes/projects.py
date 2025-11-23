@@ -118,6 +118,7 @@ def get_specific_project(project_id):
     # Verifica se o usuário existe
     if not user:
       return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401 
+
     project = find_project_by_id(project_id)
     # Verifica se o projeto existe
     if not project:

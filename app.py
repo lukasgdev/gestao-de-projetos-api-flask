@@ -15,12 +15,12 @@ from routes.comments import comments_route
 app = Flask(__name__)
 jwt = JWTManager(app)
 
+# Carregando variáveis de ambiente do arquivo .env
+load_dotenv()
+
 app.json.sort_keys = False
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
-
-# Carregando variáveis de ambiente do arquivo .env
-load_dotenv()
 
 # Rota raiz para verificar se a API está funcionando
 @app.route("/")
