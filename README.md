@@ -1,6 +1,6 @@
 # API de Gerenciamento de Projetos
 
-Esta é uma API REST desenvolvida em Flask para a disciplina de Linguagem de Programação. O projeto simula um sistema de gerenciamento de tarefas (similar ao Trello), com foco na autenticação de usuários e persistência de dados em arquivos CSV.
+API RESTful desenvolvida em Python com Flask para gerenciamento de projetos, listas e tarefas (estilo Kanban/Trello). O sistema utiliza persistência de dados em arquivos CSV e autenticação segura via JWT.
 
 ---
 
@@ -12,12 +12,32 @@ Esta é uma API REST desenvolvida em Flask para a disciplina de Linguagem de Pro
 
 ---
 
+## 🚀 Funcionalidades
+
+- **Autenticação e Segurança:**
+  - Cadastro e Login de usuários com criptografia.
+  - Proteção de rotas via **JWT (JSON Web Tokens)**.
+  - Verificação de propriedade (usuários só acessam seus próprios projetos).
+
+- **Gestão Hierárquica (CRUD Completo):**
+  - **Projetos:** Criação, listagem e edição. Deletar um projeto remove suas listas automaticamente.
+  - **Listas:** Colunas dentro do projeto (ex: "A Fazer", "Concluído").
+  - **Tarefas:** Cards vinculados às listas.
+  - **Comentários:** Interações dentro das tarefas.
+
+- **Dados e Documentação:**
+  - **Persistência em Arquivo:** Banco de dados leve usando arquivos `.csv`, sem necessidade de instalar SGBDs.
+  - **Swagger UI:** Documentação interativa gerada automaticamente.
+
+---
+
 ## 🛠️ Tecnologias Utilizadas
 
-* **Python 3**
-* **Flask:** O micro-framework principal para a criação da API.
-* **Flask-JWT-Extended:** Para gerenciamento da autenticação via JSON Web Tokens.
-* **Werkzeug:** Para hashing e verificação de senhas de usuário.
+- **Linguagem:** [Python 3](https://www.python.org/)
+- **Framework:** [Flask](https://flask.palletsprojects.com/)
+- **Autenticação:** [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/)
+- **Documentação:** [Flasgger](https://github.com/flasgger/flasgger) (OpenAPI)
+- **Utilitários:** `python-dotenv` (Variáveis de ambiente)
 
 ---
 
@@ -34,8 +54,8 @@ Siga estes passos para configurar e executar a aplicação em seu ambiente local
 ### 1. Clone o Repositório
 
 ```bash
-git clone [URL_DO_SEU_REPOSITORIO]
-cd projeto_kanban_api
+git clone https://github.com/lukasgdev/gestao-de-projetos-api-flask.git
+cd gestao-de-projetos-api-flask
 ```
 
 ### 2. Crie e Ative um Ambiente Virtual
@@ -45,7 +65,7 @@ cd projeto_kanban_api
 **No Windows:**
 ```bash
 python -m venv .venv
-.\.venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
 **No macOS / Linux:**
@@ -62,6 +82,16 @@ O arquivo `requirements.txt` contém todas as bibliotecas necessárias.
 pip install -r requirements.txt
 ```
 
+### 4. Configuração de Ambiente (.env)
+
+Crie um arquivo chamado `.env` na raiz do projeto e adicione as seguintes configurações:
+
+```bash
+FLASK_APP=app.py
+FLASK_DEBUG=True
+JWT_SECRET_KEY=chave_de_acesso
+```
+
 ### 5. Execute a Aplicação
 
 Basta executar o arquivo `app.py`.
@@ -72,38 +102,8 @@ python app.py
 
 O servidor estará rodando no modo de debug em `http://127.0.0.1:5000`.
 
----
+### 6. Documentação Interativa (Swagger)
 
-## 🗺️ Endpoints Principais da API
+Para testar as rotas visualmente e ver os exemplos de JSON, acesse:
 
-A estrutura das rotas foi desenhada para ser segura, onde a maioria dos endpoints parte de `/user` para se referir ao usuário logado.
-
-### Autenticação (Público)
-* `POST /registrar`: Cria um novo usuário (nome, email, senha).
-* `POST /login`: Autentica um usuário (email, senha) e retorna os tokens de acesso e atualização.
-
-### Usuário (Protegido)
-* `GET /user`: Retorna os dados do perfil do usuário logado.
-* `PUT /user`: Atualiza os dados (nome, email) do usuário logado.
-
-### Projetos (Protegido)
-* `GET /user/projetos`: Lista todos os projetos que pertencem ao usuário logado.
-* `POST /user/projetos`: Cria um novo projeto para o usuário.
-* `GET /user/projetos/<id_projeto>`: Busca um projeto específico do usuário.
-* `DELETE /user/projetos/<id_projeto>`: Deleta um projeto específico do usuário.
-
-### Colunas (Protegido)
-* `GET /user/projetos/<id_projeto>/colunas`: Lista as colunas de um projeto específico.
-* `POST /user/projetos/<id_projeto>/colunas`: Cria uma nova coluna no projeto.
-* `DELETE /user/projetos/<id_projeto>/colunas/<id_coluna>`: Deleta uma coluna específica.
-
-### Tarefas (Protegido)
-* `GET /user/projetos/<...>/colunas/<id_coluna>/tarefas`: Lista as tarefas de uma coluna.
-* `POST /user/projetos/<...>/colunas/<id_coluna>/tarefas`: Cria uma nova tarefa na coluna.
-* `PUT /user/projetos/<...>/tarefas/<id_tarefa>`: Atualiza uma tarefa (ex: move para outra coluna).
-* `DELETE /user/projetos/<...>/tarefas/<id_tarefa>`: Deleta uma tarefa.
-
-### Comentários (Protegido)
-* `GET /user/projetos/<...>/tarefas/<id_tarefa>/comentarios`: Lista os comentários de uma tarefa.
-* `POST /user/projetos/<...>/tarefas/<id_tarefa>/comentarios`: Cria um novo comentário na tarefa.
-
+`http://127.0.0.1:5000/apidocs`
