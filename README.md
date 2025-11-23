@@ -54,8 +54,8 @@ Siga estes passos para configurar e executar a aplicação em seu ambiente local
 ### 1. Clone o Repositório
 
 ```bash
-git clone [URL_DO_SEU_REPOSITORIO]
-cd projeto_kanban_api
+git clone https://github.com/lukasgdev/gestao-de-projetos-api-flask.git
+cd gestao-de-projetos-api-flask
 ```
 
 ### 2. Crie e Ative um Ambiente Virtual
@@ -65,7 +65,7 @@ cd projeto_kanban_api
 **No Windows:**
 ```bash
 python -m venv .venv
-.\.venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
 **No macOS / Linux:**
