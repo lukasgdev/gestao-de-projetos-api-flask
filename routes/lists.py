@@ -58,10 +58,14 @@ def create_list_for_project(project_id):
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     
+    # Verifica se o usuário é o dono do projeto
+    if current_user_id  != project.get('user_id'):
+      return jsonify({"error": "Você não tem permissão para ver as listas deste projeto"}), 403
+      
     # Verifica se o nome da lista foi fornecido
     if not list_name:
       return jsonify({"error": "O nome da lista é obrigatório"}), 400
-
+    
     #Cria a lista
     new_list = {
         "list_id": get_next_list_id(),
