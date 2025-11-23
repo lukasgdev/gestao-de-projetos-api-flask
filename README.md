@@ -102,8 +102,6 @@ python app.py
 
 O servidor estará rodando no modo de debug em `http://127.0.0.1:5000`.
 
----
-
 ### 6. Documentação Interativa (Swagger)
 
 Para testar as rotas visualmente e ver os exemplos de JSON, acesse:
