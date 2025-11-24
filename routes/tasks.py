@@ -174,7 +174,26 @@ def list_tasks(project_id, list_id):
 
     tasks = find_tasks_by_list_id(list_id)
 
-    print(tasks)
+    completed_param = request.args.get("completed")
+
+    if completed_param is not None:
+        completed_param = completed_param.lower()
+
+        if completed_param not in ["true", "false"]:
+            return jsonify({"error": "Valor inválido para completed. Use true ou false."}), 400
+
+        completed_bool = (completed_param == "true")
+
+        def normalize(value):
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, str):
+                return value.lower() == "true"
+            return False
+
+        tasks = [t for t in tasks if normalize(t.get("completed")) == completed_bool]
+    
+    #print(tasks)
 
     if not tasks:
       return jsonify({"message": "Nenhuma task encontrada para esta lista."}), 200

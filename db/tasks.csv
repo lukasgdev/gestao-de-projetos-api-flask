@@ -1,0 +1,7 @@
+task_id,title,description,completed,created_at,list_id
+1,nome da task,descrição da task,True,2025-11-24 15:09:58,1
+2,nome da task2,descrição da task,False,2025-11-24 15:10:22,1
+3,nome da task2,descrição da task,True,2025-11-24 15:10:46,1
+4,nome da task2,descrição da task,False,2025-11-24 15:10:52,1
+5,nome da task2,descrição da task,False,2025-11-24 15:11:04,1
+6,nome da task2,descrição da task,False,2025-11-24 15:11:11,1
