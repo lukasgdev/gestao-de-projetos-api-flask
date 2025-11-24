@@ -10,6 +10,10 @@ main_path = os.path.dirname(current_path)
 # pasta db
 db_path = os.path.join(main_path, "db")
 
+# cria a pasta db se não existir
+if not os.path.exists(db_path):
+    os.makedirs(db_path)
+
 # caminhos individuais
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
