@@ -26,6 +26,7 @@ def create_task(project_id, list_id):
     ---
     tags:
       - Tasks
+    operationId: "create_task"
     security:
       - Bearer: []
     parameters:
@@ -51,10 +52,25 @@ def create_task(project_id, list_id):
     responses:
       201:
         description: Task criada com sucesso
+        examples:
+          application/json:
+            message: "Task criada com sucesso!"
+            task:
+              task_id: "<id>"
+              title: "<titulo>"
+              description: "<descricao>"
+              completed: false
+              created_at: "2025-11-23 12:00:00"
       400:
         description: Erro nos dados enviados
+        examples:
+          application/json:
+            error: "Nenhum dado enviado"
       404:
         description: Projeto ou lista não encontrada
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
     """
     current_user_id = get_jwt_identity()
     data = request.get_json()
@@ -88,7 +104,7 @@ def create_task(project_id, list_id):
     }
 
     save_task(new_task)
-    return jsonify({"message": "Task criada com sucesso!", "task": new_task}), 201
+    return jsonify({"message": "Task criada com sucesso!", "data": new_task}), 201
 
 
 
@@ -100,6 +116,7 @@ def list_tasks(project_id, list_id):
     ---
     tags:
       - Tasks
+    operationId: "list_tasks"
     security:
       - Bearer: []
     parameters:
@@ -114,10 +131,32 @@ def list_tasks(project_id, list_id):
     responses:
       200:
         description: Lista de tasks retornada
+        examples:
+          application/json:
+            message: "Tasks recuperadas com sucesso"
+            data:
+              list_info:
+                list_id: "<list_id>"
+                list_name: "<nome>"
+              tasks:
+                - task_id: "1"
+                  title: "Task A"
+                  description: ""
+                  completed: false
+                - task_id: "2"
+                  title: "Task B"
+                  description: "Descrição"
+                  completed: true
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para ver as tasks deste projeto"
       404:
         description: Lista não encontrada
+        examples:
+          application/json:
+            error: "Lista não encontrada"
     """
     current_user_id = get_jwt_identity()
 
@@ -161,6 +200,7 @@ def get_specific_task(project_id, list_id, task_id):
     ---
     tags:
       - Tasks
+    operationId: "get_specific_task"
     security:
       - Bearer: []
     parameters:
@@ -179,12 +219,41 @@ def get_specific_task(project_id, list_id, task_id):
     responses:
       200:
         description: Task retornada
+        examples:
+          application/json:
+            message: "Task recuperada com sucesso"
+            data:
+              project_info:
+                project_id: "<project_id>"
+                project_title: "<titulo>"
+              list_info:
+                list_id: "<list_id>"
+                list_name: "<nome>"
+              task:
+                task_id: "<task_id>"
+                title: "<titulo>"
+                description: "<descricao>"
+                completed: false
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Task não pertence à lista
+        examples:
+          application/json:
+            error: "Esta task não pertence à lista informada"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para visualizar esta task"
       404:
         description: Task, lista ou projeto não encontrado
+        examples:
+          application/json:
+            error: "Task não encontrada"
     """
 
     current_user_id = get_jwt_identity()
@@ -248,6 +317,7 @@ def update_task(project_id, list_id, task_id):
     ---
     tags:
       - Tasks
+    operationId: "update_task"
     security:
       - Bearer: []
     parameters:
@@ -277,10 +347,19 @@ def update_task(project_id, list_id, task_id):
     responses:
       200:
         description: Task atualizada
+        examples:
+          application/json:
+            message: "Task atualizada com sucesso!"
       400:
         description: Dados inválidos
+        examples:
+          application/json:
+            error: "Dados inválidos"
       404:
         description: Task não encontrada
+        examples:
+          application/json:
+            error: "Task não encontrada"
     """
 
     current_user_id = get_jwt_identity()
@@ -322,6 +401,7 @@ def delete_task(project_id, list_id, task_id):
     ---
     tags:
       - Tasks
+    operationId: "delete_task"
     security:
       - Bearer: []
     parameters:
@@ -340,8 +420,14 @@ def delete_task(project_id, list_id, task_id):
     responses:
       200:
         description: Task deletada
+        examples:
+          application/json:
+            message: "Task deletada com sucesso!"
       404:
         description: Task não encontrada
+        examples:
+          application/json:
+            error: "Task não encontrada"
     """
     current_user_id = get_jwt_identity()
 

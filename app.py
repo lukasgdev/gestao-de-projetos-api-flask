@@ -24,12 +24,13 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 
 # Rota raiz para verificar se a API está funcionando
 @app.route("/")
-def api():
+def api_status():
     """
     Rota raiz para verificar se a API está funcionando.
     ---
     tags:
         - Root
+    operationId: "api_status"
     responses:
         200:
             description: API funcionando corretamente
@@ -73,12 +74,6 @@ swagger_template = {
             "in": "header",
             "description": "Cole o ACCESS TOKEN aqui. Ex: Bearer {token}"
         },
-        "RefreshToken": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "description": "Cole o REFRESH TOKEN aqui. Ex: Bearer {token}"
-        }
     },
     
 }

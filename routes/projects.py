@@ -13,6 +13,7 @@ def create_project():
     ---
     tags:
       - Projects
+    operationId: "create_project"
     security:
       - Bearer: []
     parameters:
@@ -29,10 +30,29 @@ def create_project():
     responses:
       201:
         description: Projeto criado
+        examples:
+          application/json:
+            message: "Projeto criado com sucesso!"
+            data:
+              project_id: "<id>"
+              project_title: "<titulo>"
+              project_description: "<descricao>"
+              created_at: "2025-11-23 12:00:00"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Dados inválidos
+        examples:
+          application/json:
+            error: "Nome do projeto é obrigatório"
       404:
         description: Usuário não encontrado
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
     """
     
     current_user_id = get_jwt_identity()
@@ -71,11 +91,29 @@ def get_my_projects():
     ---
     tags:
       - Projects
+    operationId: "get_my_projects"
     security:
       - Bearer: []
     responses:
       200:
         description: Lista de projetos retornada
+        examples:
+          application/json:
+            message: "Projetos localizados"
+            data:
+              - project_id: "1"
+                project_title: "Projeto A"
+                project_description: "Descrição"
+                created_at: "2025-11-23 11:00:00"
+              - project_id: "2"
+                project_title: "Projeto B"
+                project_description: "Outra descrição"
+                created_at: "2025-11-23 11:05:00"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
     """
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
@@ -100,6 +138,7 @@ def get_specific_project(project_id):
     ---
     tags:
       - Projects
+    operationId: "get_specific_project"
     security:
       - Bearer: []
     parameters:
@@ -110,8 +149,29 @@ def get_specific_project(project_id):
     responses:
       200:
         description: Projeto retornado
+        examples:
+          application/json:
+            message: "Projeto Localizado"
+            data:
+              project_id: "<id>"
+              project_title: "<titulo>"
+              project_description: "<descricao>"
+              owner_user: "Nome do Dono"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
+      403:
+        description: Sem permissão para acessar este projeto
+        examples:
+          application/json:
+            error: "Você não tem permissão para acessar este projeto."
       404:
-        description: Não encontrado ou sem permissão
+        description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
     """
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
@@ -141,6 +201,7 @@ def updated_project(project_id):
     ---
     tags:
       - Projects
+    operationId: "updated_project"
     security:
       - Bearer: []
     parameters:
@@ -160,12 +221,48 @@ def updated_project(project_id):
     responses:
       200:
         description: Projeto atualizado
-      400:
-        description: Título obrigatório
+        examples:
+          application/json:
+            message: "Projeto atualizado com sucesso!"
+            data:
+              project_title: "<titulo>"
+              project_description: "<descricao>"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       403:
-        description: Sem permissão
+        description: Sem permissão para acessar este projeto
+        examples:
+          application/json:
+            error: "Você não tem permissão para acessar este projeto."
       404:
         description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
+        examples:
+          application/json:
+            message: "Projeto atualizado com sucesso!"
+            data:
+              project_title: "<titulo>"
+              project_description: "<descricao>"
+      400:
+        description: Título obrigatório
+        examples:
+          application/json:
+            error: "Nome do projeto é obrigatório"
+      403:
+        description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para acessar este projeto."
+      404:
+        description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
     """
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
@@ -206,6 +303,7 @@ def delete_project(project_id):
     ---
     tags:
       - Projects
+    operationId: "delete_project"
     security:
       - Bearer: []
     parameters:
@@ -216,10 +314,37 @@ def delete_project(project_id):
     responses:
       200:
         description: Projeto deletado
+        examples:
+          application/json:
+            message: "Projeto deletado com sucesso!"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente."
       403:
-        description: Sem permissão
+        description: Sem permissão para deletar o projeto
+        examples:
+          application/json:
+            error: "Você não tem permissão para deletar este projeto"
       404:
         description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
+        examples:
+          application/json:
+            message: "Projeto deletado com sucesso!"
+      403:
+        description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para deletar este projeto"
+      404:
+        description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
     """
 
     current_user_id = get_jwt_identity()

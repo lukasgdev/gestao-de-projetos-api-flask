@@ -27,7 +27,8 @@ def create_comment(project_id, list_id, task_id):
     Criar um novo comentario
     ---
     tags:
-      - comments
+      - Comments
+    operationId: "create_comment"
     security:
       - Bearer: []
     parameters:
@@ -53,12 +54,29 @@ def create_comment(project_id, list_id, task_id):
     responses:
       201:
         description: comentario criado com sucesso
+        examples:
+          application/json:
+            message: "Comentário criado com sucesso!"
+            comment:
+              comment_id: "<id>"
+              task_id: "<task_id>"
+              content: "<conteúdo>"
+              created_at: "2025-11-23 12:00:00"
       400:
         description: sem conteudo
+        examples:
+          application/json:
+            error: "Nenhum conteúdo enviado"
       404:
         description: projeto,lista ou task não encontrada
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
       403:
         description: sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para acessar esse projeto"
     """
     current_user_id = get_jwt_identity()
     data = request.get_json()
@@ -95,7 +113,7 @@ def create_comment(project_id, list_id, task_id):
     }
 
     save_comment(new_comment)
-    return jsonify({"message": "Comentário criado com sucesso!", "comment": new_comment}), 201
+    return jsonify({"message": "Comentário criado com sucesso!", "data": new_comment}), 201
 
 
 
@@ -109,7 +127,8 @@ def list_comments(project_id, list_id, task_id):
     Listar todas os comentarios de uma task
     ---
     tags:
-      - comments
+      - Comments
+    operationId: "list_comments"
     security:
       - Bearer: []
     parameters:
@@ -128,10 +147,31 @@ def list_comments(project_id, list_id, task_id):
     responses:
       200:
         description: Lista de comentarios retornada
+        examples:
+          application/json:
+            message: "Comentários recuperados com sucesso"
+            data:
+              task_info:
+                task_id: "<task_id>"
+                title: "<titulo>"
+                description: "<descricao>"
+              comments:
+                - comment_id: "1"
+                  content: "Comentário A"
+                  created_at: "2025-11-23 11:00:00"
+                - comment_id: "2"
+                  content: "Comentário B"
+                  created_at: "2025-11-23 11:05:00"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para ver os comentários deste projeto"
       404:
         description: comentario não encontrado
+        examples:
+          application/json:
+            error: "Task não encontrada"
     """
     current_user_id = get_jwt_identity()
 
@@ -182,6 +222,7 @@ def get_specific_comment(project_id, list_id, task_id, comment_id):
     ---
     tags:
       - Comments
+    operationId: "get_specific_comment"
     security:
       - Bearer: []
     parameters:
@@ -204,12 +245,40 @@ def get_specific_comment(project_id, list_id, task_id, comment_id):
     responses:
       200:
         description: Comentário retornado
+        examples:
+          application/json:
+            message: "Comentário recuperado com sucesso"
+            data:
+              project_info:
+                project_id: "<project_id>"
+              list_info:
+                list_id: "<list_id>"
+              task_info:
+                task_id: "<task_id>"
+              comment:
+                comment_id: "<comment_id>"
+                content: "<conteúdo>"
+                created_at: "2025-11-23 12:00:00"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, faça login novamente."
       400:
         description: Alguma entidade não pertence ao nível correto
+        examples:
+          application/json:
+            error: "Esta lista não pertence ao projeto informado"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para visualizar este projeto"
       404:
         description: Projeto, lista, task ou comentário não encontrado
+        examples:
+          application/json:
+            error: "Comentário não encontrado"
     """
 
     current_user_id = get_jwt_identity()
@@ -280,7 +349,8 @@ def update_comment(project_id, list_id, task_id, comment_id):
     Atualizar um comentario
     ---
     tags:
-      - comments
+      - Comments
+    operationId: "update_comment"
     security:
       - Bearer: []
     parameters:
@@ -310,10 +380,19 @@ def update_comment(project_id, list_id, task_id, comment_id):
     responses:
       200:
         description: comentario atualizado
+        examples:
+          application/json:
+            message: "Comentário atualizado com sucesso!"
       400:
         description: Dados inválidos
+        examples:
+          application/json:
+            error: "Nenhum conteúdo enviado"
       404:
         description: comentario não encontrado
+        examples:
+          application/json:
+            error: "Comentário não encontrado"
     """
     current_user_id = get_jwt_identity()
     data = request.get_json()
@@ -356,7 +435,8 @@ def delete_comment(project_id, list_id, task_id, comment_id):
     Deletar um comentario
     ---
     tags:
-      - comments
+      - Comments
+    operationId: "delete_comment"
     security:
       - Bearer: []
     parameters:
@@ -379,8 +459,14 @@ def delete_comment(project_id, list_id, task_id, comment_id):
     responses:
       200:
         description: comentario deletado
+        examples:
+          application/json:
+            message: "Comentário deletado com sucesso!"
       404:
         description: comentario não encontrado
+        examples:
+          application/json:
+            error: "Comentário não encontrado"
     """
     current_user_id = get_jwt_identity()
 
