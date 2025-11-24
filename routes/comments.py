@@ -323,12 +323,12 @@ def get_specific_comment(project_id, list_id, task_id, comment_id):
 
     # Resposta final
     response = {
-        "project_info": {
-            "project_id": project_id,
-            "project_title": project.get("project_title"),
-            "project_description": project.get("project_description"),
-        },
-        "list_info": lista,
+        #"project_info": {
+        #    "project_id": project_id,
+        #    "project_title": project.get("project_title"),
+        #    "project_description": project.get("project_description"),
+        #},
+        #"list_info": lista,
         "task_info": task,
         "comment": comment,
     }

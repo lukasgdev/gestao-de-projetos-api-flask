@@ -291,11 +291,11 @@ def get_specific_task(project_id, list_id, task_id):
         return jsonify({"error": "Você não tem permissão para visualizar esta task"}), 403
 
     response = {
-        "project_info": {
-            "project_id": project_id,
-            "project_title": project.get('project_title'),
-            "project_description": project.get('project_description'),
-        },
+        #"project_info": {
+        #    "project_id": project_id,
+        #    "project_title": project.get('project_title'),
+        #    "project_description": project.get('project_description'),
+        #},
         "list_info": {
             "list_id": list_id,
             "list_name": lista.get('list_name'),
