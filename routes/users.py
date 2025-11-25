@@ -32,7 +32,7 @@ def create_user():
               example: "1234"
             name:
               type: string
-              example: João Silva
+              example: Seu Username
     responses:
       201:
         description: Usuário cadastrado com sucesso

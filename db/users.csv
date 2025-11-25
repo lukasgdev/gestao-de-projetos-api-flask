@@ -1,2 +1,0 @@
-user_id,name,email,password_hash,created_at
-1,usuario,usuario@gmail.com,scrypt:32768:8:1$bq6HEMsjyBH3pJsv$988c5491cc4dcfe5d996879af84dbc096a1de376c670cd2e474963557e4fef1c580e7db6e2631b3e599f3500654045f3813f2648357f96e5441d68c99bfd738e,2025-11-24 15:09:49

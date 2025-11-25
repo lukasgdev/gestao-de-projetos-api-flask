@@ -128,6 +128,13 @@ def list_tasks(project_id, list_id):
         name: list_id
         required: true
         type: string
+      - in: query
+        name: completed
+        required: false
+        type: string
+        enum: ["true", "false"]
+        description: Filtrar tasks por status. Use "true" para concluídas e "false" para não concluídas.
+
     responses:
       200:
         description: Lista de tasks retornada
