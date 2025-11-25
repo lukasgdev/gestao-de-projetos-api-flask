@@ -178,20 +178,25 @@ def updated_project(project_id):
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     
-    # Verifica se o nome do projeto foi fornecido
     data = request.json
     old_title = project.get("project_title")
+    old_description = project.get("project_description", "")
+
     new_title = data.get("project_title") or old_title
-    new_description = project.get("project_description","")
+    new_description = data.get("project_description", old_description)
 
     # Verifica se o usuário é o dono do projeto
     owner_user_id = project.get("user_id")
     if owner_user_id != current_user_id:
       return jsonify({"error": "Você não tem permissão para acessar este projeto."}), 403
     
+    # Verifica se o nome do projeto foi fornecido
+    if not new_title or not new_title.strip():
+      return jsonify({"error": "Título do projeto não pode ser vazio"}), 400
+    
     new_data_to_update = {
         "project_title": new_title,
-        "project_description": data.get("project_description",new_description),
+        "project_description": new_description,
     }
 
     update_project_data(project_id, new_data_to_update)
