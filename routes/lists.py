@@ -14,12 +14,13 @@ list_route = Blueprint('lists', __name__)
 
 @list_route.route('/', methods=['POST'])
 @jwt_required()
-def create_list_for_project(project_id):
+def create_list(project_id):
     """
     Criar uma nova lista em um projeto
     ---
     tags:
       - Lists
+    operationId: "create_list"
     security:
       - Bearer: []
     parameters:
@@ -37,12 +38,34 @@ def create_list_for_project(project_id):
     responses:
       201:
         description: Lista criada
+        examples:
+          application/json:
+            message: "Lista criada com sucesso!"
+            data:
+              list_id: "<id>"
+              project_id: "<project_id>"
+              list_name: "<nome>"
+              created_at: "2025-11-23 12:00:00"
+        401:
+          description: Usuário não encontrado (token inválido/usuário removido)
+          examples:
+            application/json:
+              error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Nome obrigatório
+        examples:
+          application/json:
+            error: "O nome da lista é obrigatório"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para ver as listas deste projeto"
       404:
         description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
     """
     data = request.json
     list_name = data.get('list_name')
@@ -92,6 +115,7 @@ def get_project_lists(project_id):
     ---
     tags:
       - Lists
+    operationId: "get_project_lists"
     security:
       - Bearer: []
     parameters:
@@ -102,8 +126,16 @@ def get_project_lists(project_id):
     responses:
       200:
         description: Listas retornadas
+        401:
+          description: Usuário não encontrado (token inválido/usuário removido)
+          examples:
+            application/json:
+              error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       404:
         description: Projeto não encontrado
+        examples:
+          application/json:
+            error: "Projeto não encontrado"
     """
 
     project = find_project_by_id(project_id)
@@ -149,6 +181,7 @@ def get_specific_list(project_id, list_id):
     ---
     tags:
       - Lists
+    operationId: "get_specific_list"
     security:
       - Bearer: []
     parameters:
@@ -163,12 +196,38 @@ def get_specific_list(project_id, list_id):
     responses:
       200:
         description: Lista retornada
+        examples:
+          application/json:
+            message: "Lista recuperada com sucesso"
+            data:
+              project_info:
+                project_id: "<project_id>"
+                project_title: "<titulo>"
+                project_description: "<descricao>"
+              list:
+                list_id: "<list_id>"
+                project_id: "<project_id>"
+                list_name: "<nome>"
+        401:
+          description: Usuário não encontrado (token inválido/usuário removido)
+          examples:
+            application/json:
+              error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Lista não pertence ao projeto
+        examples:
+          application/json:
+            error: "Esta lista não pertence ao projeto informado"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para visualizar esta lista"
       404:
         description: Lista ou projeto não encontrado
+        examples:
+          application/json:
+            error: "Lista não encontrada"
     """
 
     specific_list = find_list_by_id(list_id)
@@ -220,6 +279,7 @@ def delete_project_list(project_id, list_id):
     ---
     tags:
       - Lists
+    operationId: "delete_project_list"
     security:
       - Bearer: []
     parameters:
@@ -234,12 +294,33 @@ def delete_project_list(project_id, list_id):
     responses:
       200:
         description: Lista deletada
+        examples:
+          application/json:
+            message: "Lista deletada com sucesso"
+            data:
+              list_id: "<list_id>"
+              project_id: "<project_id>"
+              list_name: "<nome>"
+        401:
+          description: Usuário não encontrado (token inválido/usuário removido)
+          examples:
+            application/json:
+              error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Lista não pertence ao projeto
+        examples:
+          application/json:
+            error: "Esta lista não pertence ao projeto informado"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para deletar listas deste projeto"
       404:
         description: Lista ou projeto não encontrado
+        examples:
+          application/json:
+            error: "Lista não encontrada"
     """
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
@@ -289,6 +370,7 @@ def update_list(project_id, list_id):
     ---
     tags:
       - Lists
+    operationId: "update_list"
     security:
       - Bearer: []
     parameters:
@@ -310,12 +392,29 @@ def update_list(project_id, list_id):
     responses:
       200:
         description: Lista atualizada
+        examples:
+          application/json:
+            message: "Lista renomeada para '<novo_nome>' com sucesso!"
+        401:
+          description: Usuário não encontrado (token inválido/usuário removido)
+          examples:
+            application/json:
+              error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Nome obrigatório ou lista inválida
+        examples:
+          application/json:
+            error: "O novo nome da lista é obrigatório"
       403:
         description: Sem permissão
+        examples:
+          application/json:
+            error: "Você não tem permissão para editar listas deste projeto"
       404:
         description: Lista ou projeto não encontrado
+        examples:
+          application/json:
+            error: "Lista não encontrada"
     """
     # Pega o novo nome
     data = request.json
@@ -334,7 +433,6 @@ def update_list(project_id, list_id):
       return jsonify({"error": "Projeto não encontrado"}), 404
 
     # Verifica se a lista existe
-    lista = find_list_by_id(list_id)
     if not lista:
       return jsonify({"error": "Lista não encontrada"}), 404
     

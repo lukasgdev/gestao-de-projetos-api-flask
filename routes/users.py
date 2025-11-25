@@ -13,6 +13,7 @@ def create_user():
     ---
     tags:
       - Users
+    operationId: "create_user"
     consumes:
       - application/json
     parameters:
@@ -35,8 +36,19 @@ def create_user():
     responses:
       201:
         description: Usuário cadastrado com sucesso
+        examples:
+          application/json:
+            message: "Usuário cadastrado com sucesso"
+            data:
+              user_id: "<id>"
+              name: "<nome>"
+              email: "usuario@email.com"
+              created_at: "2025-11-23 12:00:00"
       400:
         description: Dados inválidos ou email já cadastrado
+        examples:
+          application/json:
+            error: "Email, senha e nome são obrigatorios"
     """
     data = request.json
     email = data.get('email', '')
@@ -67,12 +79,13 @@ def create_user():
     return jsonify({"message": 'Usuário cadastrado com sucesso', "data": new_user}), 201
 
 @user_route.route('/login', methods=['POST'])
-def login():
+def user_login():
     """
     Realiza login e retorna tokens JWT.
     ---
     tags:
       - Users
+    operationId: "user_login"
     consumes:
       - application/json
     parameters:
@@ -92,10 +105,20 @@ def login():
     responses:
       200:
         description: Login bem-sucedido, tokens retornados
+        examples:
+          application/json:
+            access_token: "<jwt_access_token>"
+            refresh_token: "<jwt_refresh_token>"
       400:
         description: Dados incompletos
+        examples:
+          application/json:
+            error: "Email e senha são obrigatorios"
       401:
         description: Credenciais inválidas
+        examples:
+          application/json:
+            error: "Email ou senha inválidos"
     """
     data = request.json
     email = data.get('email', '')
@@ -130,13 +153,20 @@ def refresh_token():
     ---
     tags:
       - Users
+    operationId: "refresh_token"
     security:
       - RefreshToken: []
     responses:
       200:
         description: Novo access token gerado
-      404:
-        description: Usuário não encontrado
+        examples:
+          application/json:
+            access_token: "<jwt_access_token>"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
     """
     current_user_id = get_jwt_identity()
     
@@ -158,13 +188,25 @@ def user_info():
     ---
     tags:
       - Users
+    operationId: "user_info"
     security:
       - Bearer: []
     responses:
       200:
         description: Informações do usuário
-      404:
-        description: Usuário não encontrado
+        examples:
+          application/json:
+            message: "Perfil recuperado com sucesso"
+            data:
+              user_id: "<id>"
+              name: "<nome>"
+              email: "usuario@email.com"
+              created_at: "2025-11-23 12:00:00"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
     """
     current_user_id = get_jwt_identity()
 
@@ -186,6 +228,7 @@ def update_user():
     ---
     tags:
       - Users
+    operationId: "update_user"
     security:
       - Bearer: []
     consumes:
@@ -206,8 +249,23 @@ def update_user():
     responses:
       200:
         description: Dados atualizados com sucesso
+        examples:
+          application/json:
+            message: "Cadastro atualizado com sucesso!"
+            data:
+              user_id: "<id>"
+              name: "<nome>"
+              email: "usuario@email.com"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Nenhum dado enviado
+        examples:
+          application/json:
+            error: "Informe o que deseja atualizar corretamente"
     """
     current_user_id = get_jwt_identity()
 
@@ -245,6 +303,7 @@ def delete_user():
     ---
     tags:
       - Users
+    operationId: "delete_user"
     security:
       - Bearer: []
     consumes:
@@ -263,12 +322,24 @@ def delete_user():
     responses:
       200:
         description: Usuário deletado
+        examples:
+          application/json:
+            message: "Usuario deletado!"
       400:
         description: Senha não informada
+        examples:
+          application/json:
+            error: "informe a senha de usuario"
+      401:
+        description: Usuário não encontrado
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente."
       401:
         description: Senha inválida
-      404:
-        description: Usuário não encontrado
+        examples:
+          application/json:
+            error: "Senha inválida."
     """
     current_user_id = get_jwt_identity()
 

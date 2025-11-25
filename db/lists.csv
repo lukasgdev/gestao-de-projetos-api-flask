@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 list_id,project_id,list_name,created_at
 <<<<<<< HEAD
 1,1,Listando...,2025-11-22 22:46:21
 =======
 1,1,Listando...,2025-11-23 14:02:12
 >>>>>>> 9aa150b07d9162aabc50a85dfcd8657525e0c10e
+=======
+list_id,project_id,list_name,created_at
+1,1,Nome da lista,2025-11-24 15:09:55
+>>>>>>> 7bbf7a50882bdbde9022bdf4705f73bd8d266a0a

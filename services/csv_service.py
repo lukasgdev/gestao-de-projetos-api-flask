@@ -10,6 +10,10 @@ main_path = os.path.dirname(current_path)
 # pasta db
 db_path = os.path.join(main_path, "db")
 
+# cria a pasta db se não existir
+if not os.path.exists(db_path):
+    os.makedirs(db_path)
+
 # caminhos individuais
 USERS = os.path.join(db_path, "users.csv")
 PROJECTS = os.path.join(db_path, "projects.csv")
@@ -79,7 +83,7 @@ def find_user_by_id(user_id):
 def get_next_user_id():
     users = read_csv(USERS)
     if not users:
-        return 1
+        return '1'
     max_id = max(int(u.get("user_id", 0)) for u in users)
     return str(max_id + 1)
 
@@ -122,7 +126,7 @@ def save_project(project):
 def get_next_project_id():
     projects = read_csv(PROJECTS)
     if not projects:
-        return 1
+        return '1'
     max_id = max(int(p.get("project_id", 0)) for p in projects)
     return str(max_id + 1)
 
@@ -182,7 +186,7 @@ def delete_project_data(project_id):
 def get_next_list_id():
     lists_data = read_csv(LISTS)
     if not lists_data:
-        return 1
+        return '1'
     max_id = max(int(l.get("list_id", 0)) for l in lists_data)
     return str(max_id + 1)
 
@@ -236,7 +240,7 @@ def delete_list_data(list_id):
 def get_next_task_id():
     tasks = read_csv(TASKS)
     if not tasks:
-        return 1
+        return '1'
     max_id = max(int(t.get("task_id",0)) for t in tasks)
 
     return str(max_id + 1)
@@ -304,7 +308,7 @@ def find_comment_by_id(comment_id):
 def get_next_comment_id():
     comments = read_csv(COMMENTS)
     if not comments:
-        return 1
+        return '1'
     max_id = max(int(c.get("comment_id", 0)) for c in comments)
     return str(max_id + 1)
 
