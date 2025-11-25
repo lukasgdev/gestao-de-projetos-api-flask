@@ -1,0 +1,3 @@
+user_id,name,email,password_hash,created_at
+1,usuario,usuario@gmail.com,scrypt:32768:8:1$ghvDwEnnMIMJS0OK$10a26ad7b5862cef993741ae68e27ea56b2b7d9952537f9e5e2cd70f8b143cc6e0fd1640e1893fb964c4a23e632fca5b3560496e368f136c0ba19f0b4be3cba5,2025-11-25 20:23:36
+2,professor,professor@gmail.com,scrypt:32768:8:1$gpBTBRUYvxYUWzq5$14b0b2ad683b7ae464a765df74214db43e272b3049943d3cc5d6e3d12831bfe7178f9ee25fd5e1e98de670d1c94141cbc6e0741beaba86ab33ce6784e133f371,2025-11-25 20:26:55

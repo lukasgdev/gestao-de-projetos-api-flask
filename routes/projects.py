@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from services.csv_service import find_project_by_id, find_user_by_id, get_next_project_id, save_project, find_projects_by_user_id, find_project_by_id, update_project_data, delete_project_data, find_lists_by_project_id
+from services.csv_service import find_user_by_id, get_next_project_id, save_project, find_projects_by_user_id, find_project_by_id, update_project_data, delete_project_data, find_lists_by_project_id
 from datetime import datetime
 
 projects_route = Blueprint('projects', __name__)

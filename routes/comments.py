@@ -80,6 +80,7 @@ def create_comment(project_id, list_id, task_id):
     """
     current_user_id = get_jwt_identity()
     data = request.get_json()
+    content = data.get('content')
 
     if not data or "content" not in data:
       return jsonify({"error": "Nenhum conteúdo enviado"}), 400
@@ -102,6 +103,9 @@ def create_comment(project_id, list_id, task_id):
     task = find_task_by_id(task_id)
     if not task or str(task["list_id"]) != str(list_id):
       return jsonify({"error": "Task não encontrada na lista"}), 404
+
+    if not content:
+      return jsonify({"error": "O conteudo é obrigatório"}), 400
 
     new_comment_id = get_next_comment_id()
 
@@ -396,6 +400,7 @@ def update_comment(project_id, list_id, task_id, comment_id):
     """
     current_user_id = get_jwt_identity()
     data = request.get_json()
+    content = data.get('content')
 
     if not data or "content" not in data:
       return jsonify({"error": "Nenhum conteúdo enviado"}), 400
@@ -416,6 +421,9 @@ def update_comment(project_id, list_id, task_id, comment_id):
     task = find_task_by_id(task_id)
     if not task or str(task["list_id"]) != str(list_id):
       return jsonify({"error": "Task inválida"}), 400
+
+    if not content:
+      return jsonify({"error": "O conteudo é obrigatório"}), 400
 
     updated = update_comment_data(comment_id, data["content"])
     if not updated:

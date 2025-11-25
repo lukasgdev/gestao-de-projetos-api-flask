@@ -46,11 +46,11 @@ def create_list(project_id):
               project_id: "<project_id>"
               list_name: "<nome>"
               created_at: "2025-11-23 12:00:00"
-        401:
-          description: Usuário não encontrado (token inválido/usuário removido)
-          examples:
-            application/json:
-              error: "Usuário não encontrado. Por favor, efetuar o login novamente"
+      401:
+        description: Usuário não encontrado (token inválido/usuário removido)
+        examples:
+          application/json:
+            error: "Usuário não encontrado. Por favor, efetuar o login novamente"
       400:
         description: Nome obrigatório
         examples:
@@ -82,7 +82,7 @@ def create_list(project_id):
       return jsonify({"error": "Projeto não encontrado"}), 404
     
     # Verifica se o usuário é o dono do projeto
-    if current_user_id  != project.get('user_id'):
+    if current_user_id != project.get('user_id'):
       return jsonify({"error": "Você não tem permissão para ver as listas deste projeto"}), 403
       
     # Verifica se o nome da lista foi fornecido
@@ -158,16 +158,16 @@ def get_project_lists(project_id):
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
 
-    # Verifica se o usuário existe
-    if not user:
-      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
-
     # Verifica se o projeto existe
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     
+    # Verifica se o usuário existe
+    if not user:
+      return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
+
     # Verifica se o usuário é o dono do projeto
-    if current_user_id  != project.get('user_id'):
+    if current_user_id != project.get('user_id'):
       return jsonify({"error": "Você não tem permissão para ver as listas deste projeto"}), 403
 
     # Verifica se o projeto possui listas
@@ -467,5 +467,5 @@ def update_list(project_id, list_id):
 
     # Atualiza
     update_list_data(list_id, {'list_name': new_name})
-    return jsonify({"message": f"Lista renomeada para com sucesso!",
+    return jsonify({"message": f"Lista renomeada com sucesso!",
                     "data": new_name}), 200

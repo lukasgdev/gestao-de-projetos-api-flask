@@ -47,8 +47,6 @@ def create_task(project_id, list_id):
               type: string
             description:
               type: string
-            completed:
-              type: boolean
     responses:
       201:
         description: Task criada com sucesso
@@ -74,6 +72,7 @@ def create_task(project_id, list_id):
     """
     current_user_id = get_jwt_identity()
     data = request.get_json()
+    title = data.get('title')
 
     if not data:
       return jsonify({"error": "Nenhum dado enviado"}), 400
@@ -91,6 +90,9 @@ def create_task(project_id, list_id):
     lista = find_list_by_id(list_id)
     if not lista or str(lista["project_id"]) != str(project_id):
       return jsonify({"error": "Lista não encontrada no projeto"}), 404
+
+    if not title:
+      return jsonify({"error": "O nome da task é obrigatório"}), 400
 
     new_task_id = get_next_task_id()
 
@@ -390,6 +392,7 @@ def update_task(project_id, list_id, task_id):
 
     current_user_id = get_jwt_identity()
     data = request.get_json()
+    title = data.get('title')
 
     task = find_task_by_id(task_id)
     if not task:
@@ -408,6 +411,9 @@ def update_task(project_id, list_id, task_id):
       return jsonify({"error": "Projeto não encontrado"}), 404
     if str(project["user_id"]) != str(current_user_id):
       return jsonify({"error": "Você não tem permissão para acessar esta task"}), 403
+
+    if not title:
+      return jsonify({"error": "O novo nome da task é obrigatório"}), 400
 
     new_data = {
         "title": data.get("title", task["title"]),
