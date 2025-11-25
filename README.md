@@ -102,7 +102,11 @@ python app.py
 
 O servidor estará rodando no modo de debug em `http://127.0.0.1:5000`.
 
-### 6. Documentação Interativa (Swagger)
+### 6. Collection no Postman
+
+[API de Gerenciamento de Projetos](https://www.postman.com/lukasgdev-876b8817-4402242/api-de-gerenciamento-de-projetos/collection/qvhybiy/api?action=share&creator=49925006&active-environment=49925006-d171fc87-b28b-4fbe-9e4e-d35796a862d9)
+
+### 7. Documentação Interativa (Swagger)
 
 Para testar as rotas visualmente e ver os exemplos de JSON, acesse:
 
