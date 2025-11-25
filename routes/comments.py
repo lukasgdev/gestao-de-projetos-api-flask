@@ -405,7 +405,7 @@ def update_comment(project_id, list_id, task_id, comment_id):
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     if str(project["user_id"]) != str(current_user_id):
-      return jsonify({"error": "Sem permissão"}), 403
+      return jsonify({"error": "Você não tem permissão para acessar este comment"}), 403
 
     # verifica lista
     lista = find_list_by_id(list_id)
@@ -475,7 +475,7 @@ def delete_comment(project_id, list_id, task_id, comment_id):
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     if str(project["user_id"]) != str(current_user_id):
-      return jsonify({"error": "Sem permissão"}), 403
+      return jsonify({"error": "Você não tem permissão para acessar este comment"}), 403
 
     # verifica lista
     lista = find_list_by_id(list_id)

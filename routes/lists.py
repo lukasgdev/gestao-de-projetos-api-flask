@@ -84,11 +84,11 @@ def create_list(project_id):
     # Verifica se o usuário é o dono do projeto
     if current_user_id  != project.get('user_id'):
       return jsonify({"error": "Você não tem permissão para ver as listas deste projeto"}), 403
-    
+      
     # Verifica se o nome da lista foi fornecido
     if not list_name:
       return jsonify({"error": "O nome da lista é obrigatório"}), 400
-
+    
     #Cria a lista
     new_list = {
         "list_id": get_next_list_id(),
@@ -126,6 +126,21 @@ def get_project_lists(project_id):
     responses:
       200:
         description: Listas retornadas
+        examples:
+          application/json:
+            message: "Listas recuperadas com sucesso"
+            data:
+              project_info:
+                project_id: "<project_id>"
+                project_title: "<titulo>"
+                project_description: "<descricao>"
+              lists:
+                - list_id: "<list_id>"
+                  project_id: "<project_id>"
+                  list_name: "<nome>"
+                - list_id: "<list_id>"
+                  project_id: "<project_id>"
+                  list_name: "<nome>"
         401:
           description: Usuário não encontrado (token inválido/usuário removido)
           examples:
@@ -142,7 +157,7 @@ def get_project_lists(project_id):
     my_lists = find_lists_by_project_id(project_id)
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
-    
+
     # Verifica se o usuário existe
     if not user:
       return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
@@ -338,11 +353,12 @@ def delete_project_list(project_id, list_id):
     if lista.get('project_id') != str(project_id):
       return jsonify({"error": "Esta lista não pertence ao projeto informado"}), 400
 
-    # Verifica o Projeto e a Permissão do Dono
+    # verifica se o Projeto existe
     project = find_project_by_id(project_id)
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
-
+    
+    # verifica a Permissão do Dono
     owner_user_id = project.get('user_id')
     if owner_user_id != current_user_id:
       return jsonify({"error": "Você não tem permissão para deletar listas deste projeto"}), 403
@@ -393,7 +409,8 @@ def update_list(project_id, list_id):
         description: Lista atualizada
         examples:
           application/json:
-            message: "Lista renomeada para '<novo_nome>' com sucesso!"
+            message: "Lista renomeada para com sucesso!"
+            data: "<novo_nome>"
         401:
           description: Usuário não encontrado (token inválido/usuário removido)
           examples:
@@ -418,10 +435,10 @@ def update_list(project_id, list_id):
     # Pega o novo nome
     data = request.json
     new_name = data.get('list_name')
-
     current_user_id = get_jwt_identity()
     user = find_user_by_id(current_user_id)
-    
+    lista = find_list_by_id(list_id)
+
     # Verifica se o usuário existe
     if not user:
       return jsonify({"error": "Usuário não encontrado. Por favor, efetuar o login novamente"}), 401
@@ -432,9 +449,12 @@ def update_list(project_id, list_id):
       return jsonify({"error": "Projeto não encontrado"}), 404
 
     # Verifica se a lista existe
-    lista = find_list_by_id(list_id)
     if not lista:
       return jsonify({"error": "Lista não encontrada"}), 404
+    
+    # Verifica se essa lista pertence mesmo ao projeto informado na URL
+    if lista.get('project_id') != str(project_id):
+      return jsonify({"error": "Esta lista não pertence ao projeto informado"}), 400
     
      # Verifica se o novo nome foi fornecido
     if not new_name:
@@ -447,4 +467,5 @@ def update_list(project_id, list_id):
 
     # Atualiza
     update_list_data(list_id, {'list_name': new_name})
-    return jsonify({"message": f"Lista renomeada para '{new_name}' com sucesso!"}), 200
+    return jsonify({"message": f"Lista renomeada para com sucesso!",
+                    "data": new_name}), 200

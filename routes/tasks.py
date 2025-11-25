@@ -407,7 +407,7 @@ def update_task(project_id, list_id, task_id):
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     if str(project["user_id"]) != str(current_user_id):
-      return jsonify({"error": "Sem permissão"}), 403
+      return jsonify({"error": "Você não tem permissão para acessar esta task"}), 403
 
     new_data = {
         "title": data.get("title", task["title"]),
@@ -472,7 +472,7 @@ def delete_task(project_id, list_id, task_id):
     if not project:
       return jsonify({"error": "Projeto não encontrado"}), 404
     if str(project["user_id"]) != str(current_user_id):
-      return jsonify({"error": "Sem permissão"}), 403
+      return jsonify({"error": "Você não tem permissão para acessar esta task"}), 403
 
     delete_task_data(task_id)
     return jsonify({"message": "Task deletada com sucesso!"}), 200
