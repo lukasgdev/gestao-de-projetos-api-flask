@@ -104,7 +104,7 @@ O servidor estará rodando no modo de debug em `http://127.0.0.1:5000`.
 
 ### 6. Collection no Postman
 
-[API de Gerenciamento de Projetos](https://www.postman.com/lukasgdev-876b8817-4402242/api-de-gerenciamento-de-projetos/collection/qvhybiy/api?action=share&creator=49925006&active-environment=49925006-d171fc87-b28b-4fbe-9e4e-d35796a862d9)
+[API de Gerenciamento de Projetos](https://lukasgdev-876b8817-4402242.postman.co/workspace/API-de-Gerenciamento-de-Projeto~92f75c53-1a21-4e7d-8d5e-e1766d3470cc/collection/49925006-67fa4fc4-03fc-41dc-b76c-f26e05c5ffd5?action=share&creator=49925006&active-environment=49925006-d171fc87-b28b-4fbe-9e4e-d35796a862d9)
 
 ### 7. Documentação Interativa (Swagger)
 
