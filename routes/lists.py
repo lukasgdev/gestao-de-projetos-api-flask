@@ -126,6 +126,21 @@ def get_project_lists(project_id):
     responses:
       200:
         description: Listas retornadas
+        examples:
+          application/json:
+            message: "Listas recuperadas com sucesso"
+            data:
+              project_info:
+                project_id: "<project_id>"
+                project_title: "<titulo>"
+                project_description: "<descricao>"
+              lists:
+                - list_id: "<list_id>"
+                  project_id: "<project_id>"
+                  list_name: "<nome>"
+                - list_id: "<list_id>"
+                  project_id: "<project_id>"
+                  list_name: "<nome>"
         401:
           description: Usuário não encontrado (token inválido/usuário removido)
           examples:
@@ -394,7 +409,8 @@ def update_list(project_id, list_id):
         description: Lista atualizada
         examples:
           application/json:
-            message: "Lista renomeada para '<novo_nome>' com sucesso!"
+            message: "Lista renomeada para com sucesso!"
+            data: "<novo_nome>"
         401:
           description: Usuário não encontrado (token inválido/usuário removido)
           examples:
@@ -451,4 +467,5 @@ def update_list(project_id, list_id):
 
     # Atualiza
     update_list_data(list_id, {'list_name': new_name})
-    return jsonify({"message": f"Lista renomeada para '{new_name}' com sucesso!"}), 200
+    return jsonify({"message": f"Lista renomeada para com sucesso!",
+                    "data": new_name}), 200
